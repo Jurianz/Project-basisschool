@@ -87,6 +87,7 @@ class Game {
         this.player = new Player(canvasElement, './assets/images/bluePlayer.png', 200, 200, 100, 10);
         this.block = new Block(canvasElement, './assets/images/blueBlock.png', 50, 50, 40, 40);
         this.startView = new StartView();
+        this.continentView = new ContinentView();
     }
 }
 window.addEventListener('load', init);
