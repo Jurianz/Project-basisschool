@@ -79,7 +79,7 @@ class Canvas {
 class Game {
     constructor() {
         this.draw = () => {
-            this.startView.createScreen();
+            this.continentView.createScreen();
         };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
@@ -87,6 +87,7 @@ class Game {
         this.player = new Player(canvasElement, './assets/images/bluePlayer.png', 200, 200, 100, 10);
         this.block = new Block(canvasElement, './assets/images/blueBlock.png', 50, 50, 40, 40);
         this.startView = new StartView();
+        this.continentView = new ContinentView();
     }
 }
 window.addEventListener('load', init);
@@ -148,7 +149,24 @@ class ViewBase {
         this.createScreen();
     }
 }
+class ContinentView extends ViewBase {
+    constructor() {
+        super();
+        const canvasElement = document.getElementById('canvas');
+        this.canvas = new Canvas(canvasElement);
+    }
+    createScreen() {
+        document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.zIndex = "-1";
+    }
+}
 class DifficultyView extends ViewBase {
+    constructor() {
+        super();
+        const canvasElement = document.getElementById('canvas');
+        this.canvas = new Canvas(canvasElement);
+    }
     createScreen() {
         this.canvas.clearCanvas();
     }
