@@ -37,7 +37,7 @@ class Canvas{
         color: string,
         aligment: CanvasTextAlign= "center"
         ) {
-        this.ctx.font = `${fontSize}px Arial`;
+        this.ctx.font = `${fontSize}px Mars`;
         this.ctx.fillStyle = color;
         this.ctx.textAlign = aligment;
         this.ctx.fillText(text,xCoordinate,yCoordinate);  
@@ -73,4 +73,9 @@ class Canvas{
 
         return Math.round(Math.random() * (max - min )+ min);
     }
+
+    public getCenter(): {X: number, Y: number} {
+    return {X: this.canvas.width / 2, Y: this.canvas.height / 2}
+    }
+
 }

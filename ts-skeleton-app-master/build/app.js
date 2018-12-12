@@ -57,7 +57,7 @@ class Canvas {
         console.log('clears canvas');
     }
     writeTextToCanvas(text, fontSize, xCoordinate, yCoordinate, color, aligment = "center") {
-        this.ctx.font = `${fontSize}px Arial`;
+        this.ctx.font = `${fontSize}px Mars`;
         this.ctx.fillStyle = color;
         this.ctx.textAlign = aligment;
         this.ctx.fillText(text, xCoordinate, yCoordinate);
@@ -72,18 +72,21 @@ class Canvas {
     randomNumber(min, max) {
         return Math.round(Math.random() * (max - min) + min);
     }
+    getCenter() {
+        return { X: this.canvas.width / 2, Y: this.canvas.height / 2 };
+    }
 }
 class Game {
     constructor() {
         this.draw = () => {
-            this.canvas.clearCanvas();
-            this.player.move();
-            this.player.draw();
+            this.startView.createScreen();
         };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
-        this.ball = new Ball(canvasElement, './assets/images/redBall.png', 100, 100, 20, 20, 0);
-        this.player = new Player(canvasElement, './assets/images/bluePlayer.png', 400, 600, 100, 10);
+        this.ball = new Ball(canvasElement, './assets/images/balls/football.png', 100, 100, 10, 10, 0);
+        this.player = new Player(canvasElement, './assets/images/bluePlayer.png', 200, 200, 100, 10);
+        this.block = new Block(canvasElement, './assets/images/blueBlock.png', 50, 50, 40, 40);
+        this.startView = new StartView();
     }
 }
 window.addEventListener('load', init);
@@ -135,6 +138,33 @@ class Player extends Entity {
         if (this.keyBoardListener.getRightPressed()) {
             this.xPos += 8;
         }
+    }
+}
+class ViewBase {
+    constructor() {
+    }
+    render() {
+        this.canvas.clearCanvas();
+        this.createScreen();
+    }
+}
+class DifficultyView extends ViewBase {
+    createScreen() {
+        this.canvas.clearCanvas();
+    }
+}
+class StartView extends ViewBase {
+    constructor() {
+        super();
+        const canvasElement = document.getElementById('canvas');
+        this.canvas = new Canvas(canvasElement);
+    }
+    createScreen() {
+        document.body.style.background = "url('./assets/images/backgrounds/startBackground.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.zIndex = "-1";
+        this.canvas.writeTextToCanvas('World Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
+        this.canvas.writeImageToCanvas('./assets/images/startscreenButton.png', this.canvas.getCenter().X - 267, this.canvas.getCenter().Y / 2.2);
     }
 }
 //# sourceMappingURL=app.js.map

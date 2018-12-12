@@ -5,19 +5,23 @@ class Game{
     private readonly canvas: Canvas;
     private readonly ball: Ball;
     private readonly player: Player;
-    private readonly block: Array<Block>;
+    private readonly block: Block;
+    private readonly startView: StartView;
 
     public constructor() {
         const canvasElement: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
-        this.ball = new Ball(canvasElement, './assets/images/redBall.png', 100, 100, 20, 20, 0);
-        this.player = new Player(canvasElement, './assets/images/bluePlayer.png', 400, 600, 100, 10);
+        this.ball = new Ball(canvasElement, './assets/images/balls/football.png', 100, 100, 10, 10, 0);
+        this.player = new Player(canvasElement, './assets/images/bluePlayer.png', 200, 200, 100, 10);
+        this.block = new Block(canvasElement,'./assets/images/blueBlock.png',50,50,40,40);
+        this.startView = new StartView()
+
+
     }
 
     draw = () => {
-        this.canvas.clearCanvas();
-        this.player.move();
-        this.player.draw();
+        this.startView.createScreen();
+        
     }
 
     

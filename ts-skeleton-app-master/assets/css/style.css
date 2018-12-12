@@ -6,10 +6,15 @@
 canvas {
     width: 100vw;
     height: 100vh;
-    background-image: url('../images/spaceBackground.png');
+    
     background-size: contain;
 }
 
 body {
     overflow: hidden;
+}
+@font-face {
+
+    font-family:'Mars';
+    src: url('../images/fonts/Mars.ttf');
 }
