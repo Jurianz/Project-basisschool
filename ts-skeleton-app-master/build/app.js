@@ -45,12 +45,38 @@ class Block extends Entity {
         super(canvas, imgSource, xPos, yPos, width, height);
     }
 }
+class ButtonAction {
+    constructor(x, y, h, w, fn) {
+        this.x = x;
+        this.y = y;
+        this.h = h;
+        this.w = w;
+        this.fn = fn;
+    }
+    ExecuteIfInArea(x, y) {
+        if (x > this.x && x < this.x + this.w &&
+            y > this.y && y < this.y + this.h) {
+            this.fn();
+        }
+    }
+}
 class Canvas {
     constructor(canvas) {
+        this.clickCommands = new Map();
         this.canvas = canvas;
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.ctx = this.canvas.getContext('2d');
+        document.addEventListener('click', (event) => {
+            this.OnClick(event);
+        });
+    }
+    OnClick(Event) {
+        let X = Event.x;
+        let Y = Event.y;
+        this.clickCommands.forEach((value, key) => {
+            value.ExecuteIfInArea(X, Y);
+        });
     }
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -93,7 +119,6 @@ window.addEventListener('load', init);
 function init() {
     const gameName = new Game();
     window.setInterval(gameName.draw, 1000 / 60);
-    console.log('in init');
 }
 class KeyBoardListener {
     constructor() {
@@ -158,13 +183,15 @@ class StartView extends ViewBase {
         super();
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
+        this.buttonAction = new ButtonAction(160, 100, 60, 150, this.canvas.clearCanvas);
     }
     createScreen() {
         document.body.style.background = "url('./assets/images/backgrounds/startBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
         document.body.style.zIndex = "-1";
         this.canvas.writeTextToCanvas('World Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
-        this.canvas.writeImageToCanvas('./assets/images/startscreenButton.png', this.canvas.getCenter().X - 267, this.canvas.getCenter().Y / 2.2);
+        this.canvas.writeImageToCanvas('./assets/images/startscreenButton.png', 160, 100);
+        this.buttonAction.ExecuteIfInArea(160, 100);
     }
 }
 //# sourceMappingURL=app.js.map

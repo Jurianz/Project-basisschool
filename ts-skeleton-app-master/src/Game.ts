@@ -15,13 +15,10 @@ class Game{
         this.player = new Player(canvasElement, './assets/images/bluePlayer.png', 200, 200, 100, 10);
         this.block = new Block(canvasElement,'./assets/images/blueBlock.png',50,50,40,40);
         this.startView = new StartView()
-
-
     }
 
     draw = () => {
         this.startView.createScreen();
-        
     }
 
     
@@ -32,5 +29,4 @@ window.addEventListener('load', init);
 function init(): void {
     const gameName = new Game();
     window.setInterval(gameName.draw, 1000/60);
-    console.log('in init')
 }

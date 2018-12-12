@@ -7,6 +7,7 @@ class StartView extends ViewBase {
         const canvasElement: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
     }
+    
     createScreen() {
         document.body.style.background = "url('./assets/images/backgrounds/startBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
