@@ -28,5 +28,11 @@ class Player extends Entity{
         if (this.keyBoardListener.getRightPressed()) {
             this.xPos += 8;
         }
+        if (this.xPos < 0) {
+            this.xPos = 0
+        }
+        if (this.getX() + (this.getWidth() +150)  > window.innerWidth) {
+            this.xPos = window.innerWidth - (this.getWidth() +150)
+        }
     }
 }

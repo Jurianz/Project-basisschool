@@ -8,6 +8,7 @@ class Game{
     private readonly block: Block;
     private readonly startView: StartView;
     private readonly continentView: ContinentView;
+    private readonly levelView: LevelView;
 
     public constructor() {
         const canvasElement: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('canvas');
@@ -17,10 +18,11 @@ class Game{
         this.block = new Block(canvasElement,'./assets/images/blueBlock.png',50,50,40,40);
         this.startView = new StartView();
         this.continentView = new ContinentView();
+        this.levelView = new LevelView();
     }
 
     draw = () => {
-        this.continentView.createScreen();
+        this.levelView.createScreen();
     }
 }
 

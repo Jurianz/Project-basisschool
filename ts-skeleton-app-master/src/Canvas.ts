@@ -59,7 +59,7 @@ class Canvas{
 
         element.addEventListener("load",()=>{
             this.ctx.drawImage(element,xCoordinate,yCoordinate);
-        })
+        });
     }
 
     /**
@@ -72,10 +72,17 @@ class Canvas{
         max: number): number {
 
         return Math.round(Math.random() * (max - min )+ min);
-    }
+    };
 
     public getCenter(): {X: number, Y: number} {
     return {X: this.canvas.width / 2, Y: this.canvas.height / 2}
-    }
+    };
 
+    public getHeight() : number {
+        return this.canvas.height
+    };
+
+    public getWidth() : number {
+        return this.canvas.width
+    };
 }
