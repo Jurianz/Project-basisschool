@@ -59,7 +59,7 @@ class Canvas{
 
         element.addEventListener("load",()=>{
             this.ctx.drawImage(element,xCoordinate,yCoordinate);
-        });
+        })
     }
 
     /**
@@ -72,16 +72,36 @@ class Canvas{
         max: number): number {
 
         return Math.round(Math.random() * (max - min )+ min);
-    };
+    }
 
     public getCenter(): {X: number, Y: number} {
     return {X: this.canvas.width / 2, Y: this.canvas.height / 2}
-    };
+    }
 
+    public writeButtonToCanvas(src: string) {
+        const horizontalCenter = this.canvas.width / 2;
+        const verticalCenter = this.canvas.height / 2;
+
+        let buttonElement = document.createElement("img");
+        buttonElement.src = src;
+
+
+        buttonElement.addEventListener("load", () => {
+            this.ctx.drawImage(buttonElement, horizontalCenter - 272, verticalCenter - 200);
+        });
+
+        this.canvas.addEventListener("click", (event: MouseEvent) => {
+            if (event.x > horizontalCenter - 150 && event.x < horizontalCenter + 150) {
+                if (event.y > verticalCenter -180 && event.y < verticalCenter - 124) {
+                    this.clearCanvas()
+                    const levelView = new LevelView();
+                }
+            }
+        });
+    }
     public getHeight() : number {
         return this.canvas.height
     };
-
     public getWidth() : number {
         return this.canvas.width
     };

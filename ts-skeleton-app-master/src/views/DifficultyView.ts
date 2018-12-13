@@ -9,6 +9,9 @@ class DifficultyView extends ViewBase {
     }
 
     createScreen() {
-        this.canvas.clearCanvas();
+        document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.zIndex = "-1";
+        
     }
 }

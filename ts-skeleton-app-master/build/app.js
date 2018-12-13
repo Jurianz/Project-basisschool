@@ -24,11 +24,23 @@ class Entity {
     }
 }
 class Ball extends Entity {
-    constructor(canvas, imgSource, xPos, yPos, width, height, speed) {
+    constructor(canvas, imgSource, xPos, yPos, width, height, dPos = -6, aPos = 6) {
         super(canvas, imgSource, xPos, yPos, width, height);
-        this.speed = speed;
+        this.dPos = dPos;
+        this.aPos = aPos;
     }
     move() {
+        this.xPos -= this.dPos;
+        this.yPos -= this.aPos;
+        if (this.getX() < 0) {
+            this.dPos = -6;
+        }
+        if (this.getX() + (this.getWidth() - 10) > window.innerWidth) {
+            this.dPos = 6;
+        }
+        if (this.getY() < 0) {
+            this.aPos = -6;
+        }
     }
     isCollidingWithBlock(enemy) {
         if (this.getX() < enemy.getX() + enemy.getWidth() &&
@@ -38,6 +50,15 @@ class Ball extends Entity {
             return true;
         }
         return false;
+    }
+    collidedWithPlayer() {
+        this.aPos = 6;
+    }
+    removeLife() {
+        this.aPos = 6;
+        this.dPos = -6;
+        this.xPos = this.canvas.getCenter().X;
+        this.yPos = this.canvas.getCenter().Y;
     }
 }
 class Block extends Entity {
@@ -72,11 +93,26 @@ class Canvas {
     randomNumber(min, max) {
         return Math.round(Math.random() * (max - min) + min);
     }
-    ;
     getCenter() {
         return { X: this.canvas.width / 2, Y: this.canvas.height / 2 };
     }
-    ;
+    writeButtonToCanvas(src) {
+        const horizontalCenter = this.canvas.width / 2;
+        const verticalCenter = this.canvas.height / 2;
+        let buttonElement = document.createElement("img");
+        buttonElement.src = src;
+        buttonElement.addEventListener("load", () => {
+            this.ctx.drawImage(buttonElement, horizontalCenter - 272, verticalCenter - 200);
+        });
+        this.canvas.addEventListener("click", (event) => {
+            if (event.x > horizontalCenter - 150 && event.x < horizontalCenter + 150) {
+                if (event.y > verticalCenter - 180 && event.y < verticalCenter - 124) {
+                    this.clearCanvas();
+                    const levelView = new LevelView();
+                }
+            }
+        });
+    }
     getHeight() {
         return this.canvas.height;
     }
@@ -89,22 +125,17 @@ class Canvas {
 class Game {
     constructor() {
         this.draw = () => {
-            this.levelView.createScreen();
+            this.startView.createScreen();
         };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
-        this.ball = new Ball(canvasElement, './assets/images/balls/football.png', 100, 100, 10, 10, 0);
-        this.player = new Player(canvasElement, './assets/images/bluePlayer.png', 200, 200, 100, 10);
-        this.block = new Block(canvasElement, './assets/images/blueBlock.png', 50, 50, 40, 40);
         this.startView = new StartView();
-        this.continentView = new ContinentView();
-        this.levelView = new LevelView();
+        this.draw();
     }
 }
 window.addEventListener('load', init);
 function init() {
     const gameName = new Game();
-    window.setInterval(gameName.draw, 1000 / 60);
 }
 class KeyBoardListener {
     constructor() {
@@ -144,16 +175,35 @@ class Player extends Entity {
     }
     move() {
         if (this.keyBoardListener.getLeftPressed()) {
-            this.xPos -= 8;
+            this.xPos -= 6;
         }
         if (this.keyBoardListener.getRightPressed()) {
-            this.xPos += 8;
+            this.xPos += 6;
         }
         if (this.xPos < 0) {
             this.xPos = 0;
         }
-        if (this.getX() + (this.getWidth() + 150) > window.innerWidth) {
-            this.xPos = window.innerWidth - (this.getWidth() + 150);
+        if (this.getX() + (this.getWidth()) > window.innerWidth) {
+            this.xPos = window.innerWidth - (this.getWidth());
+        }
+    }
+    isCollidingWithBall(enemy) {
+        if (this.getX() < enemy.getX() + enemy.getWidth() &&
+            this.getX() + this.getWidth() > enemy.getX() &&
+            this.getY() < enemy.getY() + enemy.getHeight() &&
+            this.getY() + this.getHeight() > enemy.getY()) {
+            return true;
+        }
+        return false;
+    }
+    getLives() {
+        return this.lives;
+    }
+    removeLife() {
+        this.lives -= 1;
+        if (this.lives == 0) {
+            alert('Game over');
+            location.reload();
         }
     }
 }
@@ -170,11 +220,13 @@ class ContinentView extends ViewBase {
         super();
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
+        this.createScreen();
     }
     createScreen() {
         document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
         document.body.style.zIndex = "-1";
+        this.canvas.writeImageToCanvas("./assets/images/continents/europe.png", this.canvas.getCenter().X - 151, this.canvas.getCenter().Y - 116);
     }
 }
 class DifficultyView extends ViewBase {
@@ -184,7 +236,9 @@ class DifficultyView extends ViewBase {
         this.canvas = new Canvas(canvasElement);
     }
     createScreen() {
-        this.canvas.clearCanvas();
+        document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.zIndex = "-1";
     }
 }
 class LevelView extends ViewBase {
@@ -198,35 +252,37 @@ class LevelView extends ViewBase {
             "./assets/images/blocks/purpleBlock.png",
             "./assets/images/blocks/yellowBlock.png"
         ];
+        this.createScreen = () => {
+            document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.zIndex = "-2";
+            this.canvas.clearCanvas();
+            this.player.move();
+            this.player.draw();
+            if (this.ball.getY() + this.ball.getHeight() > this.canvas.getHeight()) {
+                this.player.removeLife();
+                this.ball.removeLife();
+            }
+            if (this.player.isCollidingWithBall(this.ball)) {
+                this.ball.collidedWithPlayer();
+                this.ball.move();
+                this.ball.draw();
+                this.canvas.writeTextToCanvas(`lives: ${this.player.getLives()}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
+            }
+            else {
+                this.canvas.writeTextToCanvas(`lives: ${this.player.getLives()}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
+                this.ball.move();
+                this.ball.draw();
+                for (let i = 10; i < this.canvas.getWidth() - 190; i += 190) {
+                    this.canvas.writeImageToCanvas(this.imageArray[1], i, 30);
+                }
+            }
+        };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
-        this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", 500, this.canvas.getHeight() - 30, 50, 50, 3);
-    }
-    createScreen() {
-        document.body.style.background = "url('./assets/images/backgrounds/europa_background.jpg') no-repeat ";
-        document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-1";
-        this.canvas.writeImageToCanvas(this.imageArray[0], 10, 50);
-        this.canvas.writeImageToCanvas(this.imageArray[1], 200, 50);
-        this.canvas.writeImageToCanvas(this.imageArray[2], 390, 50);
-        this.canvas.writeImageToCanvas(this.imageArray[3], 580, 50);
-        this.canvas.writeImageToCanvas(this.imageArray[4], 770, 50);
-        this.canvas.writeImageToCanvas(this.imageArray[5], 960, 50);
-        this.canvas.writeImageToCanvas(this.imageArray[6], 1150, 50);
-        this.canvas.writeImageToCanvas(this.imageArray[1], 1340, 50);
-        this.canvas.writeImageToCanvas(this.imageArray[3], 1530, 50);
-        this.canvas.writeImageToCanvas(this.imageArray[0], 10, 120);
-        this.canvas.writeImageToCanvas(this.imageArray[1], 200, 120);
-        this.canvas.writeImageToCanvas(this.imageArray[2], 390, 120);
-        this.canvas.writeImageToCanvas(this.imageArray[3], 580, 120);
-        this.canvas.writeImageToCanvas(this.imageArray[4], 770, 120);
-        this.canvas.writeImageToCanvas(this.imageArray[5], 960, 120);
-        this.canvas.writeImageToCanvas(this.imageArray[6], 1150, 120);
-        this.canvas.writeImageToCanvas(this.imageArray[1], 1340, 120);
-        this.canvas.writeImageToCanvas(this.imageArray[3], 1530, 120);
-        this.canvas.clearCanvas();
-        this.player.move();
-        this.player.draw();
+        this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", 500, this.canvas.getHeight() - 30, 200, 25);
+        this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", 900, 500, 35, 35);
+        window.setInterval(this.createScreen, 1000 / 60);
     }
 }
 class StartView extends ViewBase {
@@ -238,9 +294,9 @@ class StartView extends ViewBase {
     createScreen() {
         document.body.style.background = "url('./assets/images/backgrounds/startBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-1";
+        document.body.style.zIndex = "-3";
         this.canvas.writeTextToCanvas('World Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
-        this.canvas.writeImageToCanvas('./assets/images/startscreenButton.png', this.canvas.getCenter().X - 267, this.canvas.getCenter().Y / 2.2);
+        this.canvas.writeButtonToCanvas('./assets/images/startscreenButton.png');
     }
 }
 //# sourceMappingURL=app.js.map
