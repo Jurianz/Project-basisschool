@@ -2,10 +2,16 @@ class KeyBoardListener{
 
     private leftPressed: boolean;
     private rightPressed: boolean;
+    private onePressed: boolean;
+    private twoPressed: boolean;
+    private threePressed: boolean;
     
     public constructor(){
         this.leftPressed = false;
         this.rightPressed = false;
+        this.onePressed = false;
+        this.twoPressed = false;
+        this.threePressed = false;
         window.addEventListener("keydown", this.keyDownHandler);
         window.addEventListener("keyup", this.keyUpHandler);
     }
@@ -20,6 +26,15 @@ class KeyBoardListener{
         if (event.keyCode == 39) {
             this.rightPressed = true;
         }
+        if (event.keyCode == 49) {
+            this.onePressed = true;
+        }
+        if (event.keyCode == 50) {
+            this.twoPressed = true;
+        }
+        if (event.keyCode == 51) {
+            this.threePressed = true;
+        }
     }
 
     /**
@@ -31,6 +46,15 @@ class KeyBoardListener{
         }
         if (event.keyCode == 39) {
             this.rightPressed = false;
+        }
+        if (event.keyCode == 49) {
+            this.onePressed = false;
+        }
+        if (event.keyCode == 50) {
+            this.twoPressed = false;
+        }
+        if (event.keyCode == 51) {
+            this.threePressed = false;
         }
     }
 
@@ -46,5 +70,26 @@ class KeyBoardListener{
      */
     public getRightPressed(): boolean{
         return this.rightPressed;
+    }
+
+    /**
+     * Function to get the onePressed property
+     */
+    public getOnePressed(): boolean{
+        return this.onePressed;
+    }
+
+    /**
+     * Function to get the twoPressed property
+     */
+    public getTwoPressed(): boolean{
+        return this.twoPressed;
+    }
+
+    /**
+     * Function to get the threePressed property
+     */
+    public getThreePressed(): boolean{
+        return this.threePressed;
     }
 }

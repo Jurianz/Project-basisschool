@@ -24,22 +24,22 @@ class Entity {
     }
 }
 class Ball extends Entity {
-    constructor(canvas, imgSource, xPos, yPos, width, height, dPos = -6, aPos = 6) {
+    constructor(canvas, imgSource, xPos, yPos, width, height, dPos = -6, wPos = 6) {
         super(canvas, imgSource, xPos, yPos, width, height);
         this.dPos = dPos;
-        this.aPos = aPos;
+        this.wPos = wPos;
     }
     move() {
-        this.xPos -= this.dPos;
-        this.yPos -= this.aPos;
+        this.xPos += this.dPos;
+        this.yPos -= this.wPos;
         if (this.getX() < 0) {
-            this.dPos = -6;
+            this.dPos = -this.dPos;
         }
         if (this.getX() + (this.getWidth() - 10) > window.innerWidth) {
-            this.dPos = 6;
+            this.dPos = -this.dPos;
         }
         if (this.getY() < 0) {
-            this.aPos = -6;
+            this.wPos = -this.wPos;
         }
     }
     isCollidingWithBlock(enemy) {
@@ -52,13 +52,15 @@ class Ball extends Entity {
         return false;
     }
     collidedWithPlayer() {
-        this.aPos = 6;
+        this.wPos = 6;
     }
     removeLife() {
-        this.aPos = 6;
-        this.dPos = -6;
+        this.wPos = -this.wPos;
         this.xPos = this.canvas.getCenter().X;
         this.yPos = this.canvas.getCenter().Y;
+    }
+    collidedWithBlock() {
+        this.wPos = -this.wPos;
     }
 }
 class Block extends Entity {
@@ -75,7 +77,6 @@ class Canvas {
     }
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        console.log('clears canvas');
     }
     writeTextToCanvas(text, fontSize, xCoordinate, yCoordinate, color, aligment = "center") {
         this.ctx.font = `${fontSize}px Mars`;
@@ -86,6 +87,7 @@ class Canvas {
     writeImageToCanvas(src, xCoordinate, yCoordinate) {
         let element = document.createElement("img");
         element.src = src;
+        element.style.zIndex = "-1";
         element.addEventListener("load", () => {
             this.ctx.drawImage(element, xCoordinate, yCoordinate);
         });
@@ -113,6 +115,7 @@ class Canvas {
             }
         });
     }
+    ;
     getHeight() {
         return this.canvas.height;
     }
@@ -146,6 +149,15 @@ class KeyBoardListener {
             if (event.keyCode == 39) {
                 this.rightPressed = true;
             }
+            if (event.keyCode == 49) {
+                this.onePressed = true;
+            }
+            if (event.keyCode == 50) {
+                this.twoPressed = true;
+            }
+            if (event.keyCode == 51) {
+                this.threePressed = true;
+            }
         };
         this.keyUpHandler = (event) => {
             if (event.keyCode == 37) {
@@ -154,9 +166,21 @@ class KeyBoardListener {
             if (event.keyCode == 39) {
                 this.rightPressed = false;
             }
+            if (event.keyCode == 49) {
+                this.onePressed = false;
+            }
+            if (event.keyCode == 50) {
+                this.twoPressed = false;
+            }
+            if (event.keyCode == 51) {
+                this.threePressed = false;
+            }
         };
         this.leftPressed = false;
         this.rightPressed = false;
+        this.onePressed = false;
+        this.twoPressed = false;
+        this.threePressed = false;
         window.addEventListener("keydown", this.keyDownHandler);
         window.addEventListener("keyup", this.keyUpHandler);
     }
@@ -165,6 +189,15 @@ class KeyBoardListener {
     }
     getRightPressed() {
         return this.rightPressed;
+    }
+    getOnePressed() {
+        return this.onePressed;
+    }
+    getTwoPressed() {
+        return this.twoPressed;
+    }
+    getThreePressed() {
+        return this.threePressed;
     }
 }
 class Player extends Entity {
@@ -209,6 +242,7 @@ class Player extends Entity {
 }
 class ViewBase {
     constructor() {
+        this.gameState = "PLAY";
     }
     render() {
         this.canvas.clearCanvas();
@@ -253,36 +287,157 @@ class LevelView extends ViewBase {
             "./assets/images/blocks/yellowBlock.png"
         ];
         this.createScreen = () => {
-            document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
-            document.body.style.backgroundSize = "cover";
-            document.body.style.zIndex = "-2";
-            this.canvas.clearCanvas();
-            this.player.move();
-            this.player.draw();
-            if (this.ball.getY() + this.ball.getHeight() > this.canvas.getHeight()) {
-                this.player.removeLife();
-                this.ball.removeLife();
-            }
-            if (this.player.isCollidingWithBall(this.ball)) {
-                this.ball.collidedWithPlayer();
+            if (this.gameState === "PLAY") {
+                this.canvas.clearCanvas();
+                this.player.move();
+                this.player.draw();
                 this.ball.move();
                 this.ball.draw();
                 this.canvas.writeTextToCanvas(`lives: ${this.player.getLives()}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
+                if (this.ball.getY() + this.ball.getHeight() > this.canvas.getHeight()) {
+                    this.player.removeLife();
+                    this.ball.removeLife();
+                }
+                if (this.player.isCollidingWithBall(this.ball)) {
+                    this.ball.collidedWithPlayer();
+                }
+                for (let index = 0; index < this.blockArray.length; index++) {
+                    this.blockArray[index].draw();
+                    if (this.ball.isCollidingWithBlock(this.blockArray[index])) {
+                        this.ball.collidedWithBlock();
+                        this.blockArray.splice(index, 1);
+                    }
+                }
+                if (this.blockArray.length < 1) {
+                    alert('Goed gedaan!');
+                    location.reload();
+                }
+                if (this.blockArray.length == 15) {
+                    this.gameState = "QUESTION";
+                    const question = new Question();
+                }
             }
-            else {
-                this.canvas.writeTextToCanvas(`lives: ${this.player.getLives()}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
-                this.ball.move();
-                this.ball.draw();
-                for (let i = 10; i < this.canvas.getWidth() - 190; i += 190) {
-                    this.canvas.writeImageToCanvas(this.imageArray[1], i, 30);
+        };
+        document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.zIndex = "-2";
+        const canvasElement = document.getElementById('canvas');
+        this.canvas = new Canvas(canvasElement);
+        this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", 500, this.canvas.getHeight() - 30, 200, 25);
+        this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", 900, 500, 35, 35);
+        this.blockArray = [new Block(canvasElement, this.imageArray[1], 10, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 200, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 390, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 580, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 770, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 960, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 1150, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 1340, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 10, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 200, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 390, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 580, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 770, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 960, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 1150, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[1], 1340, 100, 184, 61)];
+        window.setInterval(this.createScreen, 1000 / 60);
+    }
+}
+class Question extends ViewBase {
+    constructor() {
+        super();
+        this.createScreen = () => {
+            if (this.gameState === "QUESTION") {
+                this.canvas.clearCanvas();
+                this.canvas.writeTextToCanvas(this.questions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
+                this.canvas.writeTextToCanvas(` 1: ${this.questions[this.numberRandom].a}`, 50, this.canvas.getCenter().X + 100, 200, "white", "left");
+                this.canvas.writeTextToCanvas(`2: ${this.questions[this.numberRandom].b}`, 50, this.canvas.getCenter().X + 100, 300, "white", "left");
+                this.canvas.writeTextToCanvas(`3: ${this.questions[this.numberRandom].c}`, 50, this.canvas.getCenter().X + 100, 400, "white", "left");
+                if (this.keyBoardListener.getOnePressed()) {
+                    this.questionAnswer = this.questions[this.numberRandom].a;
+                }
+                if (this.keyBoardListener.getTwoPressed()) {
+                    this.questionAnswer = this.questions[this.numberRandom].b;
+                }
+                if (this.keyBoardListener.getThreePressed()) {
+                    this.questionAnswer = this.questions[this.numberRandom].c;
+                }
+                if (this.questionAnswer !== null) {
+                    if (this.questions[this.numberRandom].answer === this.questionAnswer) {
+                        alert("Goed gedaan");
+                        this.gameState = "PLAY";
+                        location.reload();
+                    }
+                    else {
+                        alert("Helaas");
+                        location.reload();
+                    }
                 }
             }
         };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
-        this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", 500, this.canvas.getHeight() - 30, 200, 25);
-        this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", 900, 500, 35, 35);
+        this.keyBoardListener = new KeyBoardListener();
+        this.gameState = "QUESTION";
+        this.questionAnswer = null;
+        document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.zIndex = "-2";
+        this.questions = [
+            {
+                question: "Welke van de volgende steden ligt in Engeland?",
+                a: "München",
+                b: "Liverpool",
+                c: "Monaco",
+                answer: "Liverpool"
+            }, {
+                question: "Welke rivier begint in Frankrijk en loopt door naar Belgie en Nederland?",
+                a: "Rijn",
+                b: "Seine",
+                c: "Rhône",
+                answer: "Rijn"
+            }, {
+                question: "Welke gebergte grenst tussen Frankrijk en Spanje?",
+                a: "Pyreneeën",
+                b: "Alpen",
+                c: "Ardennen",
+                answer: "Pyreneeën"
+            }, {
+                question: "Wat is de hoofdstad van Frankrijk?",
+                a: "Monaco",
+                b: "Lyon",
+                c: "Parijs",
+                answer: "Parijs"
+            }, {
+                question: "Hoe noem je de landen in Noord-Europa ook wel?",
+                a: "Scandinavië",
+                b: "Benelux",
+                c: "Balkanlanden",
+                answer: "Scandinavië"
+            }, {
+                question: "Wat is de hoofdstad van Noorwegen?",
+                a: "Stockholm",
+                b: "Oslo",
+                c: "Helsinki",
+                answer: "Oslo"
+            }, {
+                question: "Wat is het meest voorkomende klimaat van West-Europa?",
+                a: "Landklimaat",
+                b: "Tropisch limaat",
+                c: "Zeeklimaat",
+                answer: "Zeeklimaat"
+            }, {
+                question: "Hoe is de welvaart van Noord-Europa?",
+                a: "Slecht",
+                b: "Gemiddeld",
+                c: "Goed",
+                answer: "Goed"
+            }
+        ];
+        this.numberRandom = this.canvas.randomNumber(0, this.questions.length - 1);
         window.setInterval(this.createScreen, 1000 / 60);
+        console.log(this.gameState);
     }
 }
 class StartView extends ViewBase {
@@ -290,11 +445,11 @@ class StartView extends ViewBase {
         super();
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
-    }
-    createScreen() {
         document.body.style.background = "url('./assets/images/backgrounds/startBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-3";
+        document.body.style.zIndex = "-2";
+    }
+    createScreen() {
         this.canvas.writeTextToCanvas('World Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
         this.canvas.writeButtonToCanvas('./assets/images/startscreenButton.png');
     }

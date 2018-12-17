@@ -3,7 +3,8 @@
 class Ball extends Entity {
 
     private dPos: number;
-    private aPos: number;
+    private wPos: number;
+
     public constructor(
         canvas: HTMLCanvasElement,
         imgSource: string,
@@ -12,24 +13,24 @@ class Ball extends Entity {
         width: number,
         height: number,
         dPos: number = -6,
-        aPos: number = 6
+        wPos: number = 6
     ) {
         super(canvas, imgSource, xPos, yPos, width, height);
         this.dPos = dPos;
-        this.aPos = aPos;
+        this.wPos = wPos;
     }
 
     public move() {
-        this.xPos -= this.dPos
-        this.yPos -= this.aPos
+        this.xPos += this.dPos
+        this.yPos -= this.wPos
         if (this.getX() < 0) {
-            this.dPos = -6;
+            this.dPos = -this.dPos;
         }
         if (this.getX() + (this.getWidth() - 10) > window.innerWidth) {
-            this.dPos = 6;
+            this.dPos = -this.dPos;
         }
         if (this.getY() < 0) {
-            this.aPos = -6;
+            this.wPos = -this.wPos;
         }
     }
 
@@ -46,14 +47,17 @@ class Ball extends Entity {
     }
 
     public collidedWithPlayer() {
-        this.aPos = 6;
+        this.wPos = 6;
     }
 
     public removeLife() {
-        this.aPos = 6;
-        this.dPos = -6;
+        this.wPos = -this.wPos;
         this.xPos = this.canvas.getCenter().X;
         this.yPos = this.canvas.getCenter().Y;
+    }
+
+    public collidedWithBlock() {
+        this.wPos = -this.wPos
     }
 
 }

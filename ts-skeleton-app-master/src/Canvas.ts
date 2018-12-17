@@ -17,7 +17,6 @@ class Canvas{
      */
     public clearCanvas(): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        console.log('clears canvas')
     }
 
     /**
@@ -56,10 +55,11 @@ class Canvas{
         ) {
         let element = document.createElement("img");
         element.src = src;
+        element.style.zIndex = "-1";
 
         element.addEventListener("load",()=>{
             this.ctx.drawImage(element,xCoordinate,yCoordinate);
-        })
+        });
     }
 
     /**
@@ -98,10 +98,12 @@ class Canvas{
                 }
             }
         });
-    }
+    };
+
     public getHeight() : number {
         return this.canvas.height
     };
+
     public getWidth() : number {
         return this.canvas.width
     };
