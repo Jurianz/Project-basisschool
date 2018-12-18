@@ -12,9 +12,6 @@ class Question extends ViewBase {
         this.keyBoardListener = new KeyBoardListener();
         this.gameState = "QUESTION"
         this.questionAnswer = null;
-        document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
-        document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-2";
         this.questions = [
             {
                 question: "Welke van de volgende steden ligt in Engeland?",
@@ -39,7 +36,7 @@ class Question extends ViewBase {
                 a: "Monaco",
                 b: "Lyon",
                 c: "Parijs",
-                answer: "Parijs" 
+                answer: "Parijs"
             }, {
                 question: "Hoe noem je de landen in Noord-Europa ook wel?",
                 a: "Scandinavië",
@@ -67,38 +64,37 @@ class Question extends ViewBase {
             }
         ]
         this.numberRandom = this.canvas.randomNumber(0, this.questions.length - 1)
-        window.setInterval(this.createScreen, 1000 / 60)
-        console.log(this.gameState)
     }
 
 
     createScreen = () => {
-        if (this.gameState === "QUESTION") {
-            this.canvas.clearCanvas();
-            // this.canvas.writeImageToCanvas("./assets/images/backgrounds/questionView.png", this.canvas.getCenter().X - 425, 50);
-            this.canvas.writeTextToCanvas(this.questions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
-            this.canvas.writeTextToCanvas(` 1: ${this.questions[this.numberRandom].a}`, 50, this.canvas.getCenter().X + 100, 200, "white", "left");
-            this.canvas.writeTextToCanvas(`2: ${this.questions[this.numberRandom].b}`, 50, this.canvas.getCenter().X + 100, 300, "white", "left");
-            this.canvas.writeTextToCanvas(`3: ${this.questions[this.numberRandom].c}`, 50, this.canvas.getCenter().X + 100, 400, "white", "left");
-            if (this.keyBoardListener.getOnePressed()) {
-                this.questionAnswer = this.questions[this.numberRandom].a;
-            }
-            if (this.keyBoardListener.getTwoPressed()) {
-                this.questionAnswer = this.questions[this.numberRandom].b;
-            }
-            if (this.keyBoardListener.getThreePressed()) {
-                this.questionAnswer = this.questions[this.numberRandom].c;
-            }
-            if (this.questionAnswer !== null) {
-                if (this.questions[this.numberRandom].answer === this.questionAnswer) {
-                    alert("Goed gedaan")
-                    this.gameState = "PLAY";
-                    location.reload();
-                } else {
-                    alert("Helaas")
-                    location.reload();
-                }
+        this.canvas.clearCanvas();
+        // this.canvas.writeImageToCanvas("./assets/images/backgrounds/questionView.png", this.canvas.getCenter().X - 425, 50);
+        this.canvas.writeTextToCanvas(this.questions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
+        this.canvas.writeTextToCanvas(` 1: ${this.questions[this.numberRandom].a}`, 50, this.canvas.getCenter().X + 100, 200, "white", "left");
+        this.canvas.writeTextToCanvas(`2: ${this.questions[this.numberRandom].b}`, 50, this.canvas.getCenter().X + 100, 300, "white", "left");
+        this.canvas.writeTextToCanvas(`3: ${this.questions[this.numberRandom].c}`, 50, this.canvas.getCenter().X + 100, 400, "white", "left");
+        if (this.keyBoardListener.getOnePressed()) {
+            this.questionAnswer = this.questions[this.numberRandom].a;
+        }
+        if (this.keyBoardListener.getTwoPressed()) {
+            this.questionAnswer = this.questions[this.numberRandom].b;
+        }
+        if (this.keyBoardListener.getThreePressed()) {
+            this.questionAnswer = this.questions[this.numberRandom].c;
+        }
+        if (this.questionAnswer !== null) {
+            if (this.questions[this.numberRandom].answer === this.questionAnswer) {
+                alert("Goed gedaan")
+                location.reload();
+                this.gameState = "PLAY";
+            } else {
+                alert("Helaas")
+                location.reload();
             }
         }
+    }
+    getGameState(): string {
+        return this.gameState
     }
 }

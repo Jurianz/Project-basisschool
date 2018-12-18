@@ -314,9 +314,22 @@ class LevelView extends ViewBase {
                 }
                 if (this.blockArray.length == 15) {
                     this.gameState = "QUESTION";
+                    document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
+                    document.body.style.backgroundSize = "cover";
+                    document.body.style.zIndex = "-2";
                     const question = new Question();
+                    window.setInterval(question.createScreen, 1000 / 60);
+                    if (question.getGameState() === "PLAY") {
+                        this.compareAnswers();
+                        this.gameState = "PLAY";
+                    }
                 }
             }
+        };
+        this.compareAnswers = () => {
+            document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.zIndex = "-2";
         };
         document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
@@ -348,31 +361,29 @@ class Question extends ViewBase {
     constructor() {
         super();
         this.createScreen = () => {
-            if (this.gameState === "QUESTION") {
-                this.canvas.clearCanvas();
-                this.canvas.writeTextToCanvas(this.questions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
-                this.canvas.writeTextToCanvas(` 1: ${this.questions[this.numberRandom].a}`, 50, this.canvas.getCenter().X + 100, 200, "white", "left");
-                this.canvas.writeTextToCanvas(`2: ${this.questions[this.numberRandom].b}`, 50, this.canvas.getCenter().X + 100, 300, "white", "left");
-                this.canvas.writeTextToCanvas(`3: ${this.questions[this.numberRandom].c}`, 50, this.canvas.getCenter().X + 100, 400, "white", "left");
-                if (this.keyBoardListener.getOnePressed()) {
-                    this.questionAnswer = this.questions[this.numberRandom].a;
+            this.canvas.clearCanvas();
+            this.canvas.writeTextToCanvas(this.questions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
+            this.canvas.writeTextToCanvas(` 1: ${this.questions[this.numberRandom].a}`, 50, this.canvas.getCenter().X + 100, 200, "white", "left");
+            this.canvas.writeTextToCanvas(`2: ${this.questions[this.numberRandom].b}`, 50, this.canvas.getCenter().X + 100, 300, "white", "left");
+            this.canvas.writeTextToCanvas(`3: ${this.questions[this.numberRandom].c}`, 50, this.canvas.getCenter().X + 100, 400, "white", "left");
+            if (this.keyBoardListener.getOnePressed()) {
+                this.questionAnswer = this.questions[this.numberRandom].a;
+            }
+            if (this.keyBoardListener.getTwoPressed()) {
+                this.questionAnswer = this.questions[this.numberRandom].b;
+            }
+            if (this.keyBoardListener.getThreePressed()) {
+                this.questionAnswer = this.questions[this.numberRandom].c;
+            }
+            if (this.questionAnswer !== null) {
+                if (this.questions[this.numberRandom].answer === this.questionAnswer) {
+                    alert("Goed gedaan");
+                    location.reload();
+                    this.gameState = "PLAY";
                 }
-                if (this.keyBoardListener.getTwoPressed()) {
-                    this.questionAnswer = this.questions[this.numberRandom].b;
-                }
-                if (this.keyBoardListener.getThreePressed()) {
-                    this.questionAnswer = this.questions[this.numberRandom].c;
-                }
-                if (this.questionAnswer !== null) {
-                    if (this.questions[this.numberRandom].answer === this.questionAnswer) {
-                        alert("Goed gedaan");
-                        this.gameState = "PLAY";
-                        location.reload();
-                    }
-                    else {
-                        alert("Helaas");
-                        location.reload();
-                    }
+                else {
+                    alert("Helaas");
+                    location.reload();
                 }
             }
         };
@@ -381,9 +392,6 @@ class Question extends ViewBase {
         this.keyBoardListener = new KeyBoardListener();
         this.gameState = "QUESTION";
         this.questionAnswer = null;
-        document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
-        document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-2";
         this.questions = [
             {
                 question: "Welke van de volgende steden ligt in Engeland?",
@@ -436,8 +444,9 @@ class Question extends ViewBase {
             }
         ];
         this.numberRandom = this.canvas.randomNumber(0, this.questions.length - 1);
-        window.setInterval(this.createScreen, 1000 / 60);
-        console.log(this.gameState);
+    }
+    getGameState() {
+        return this.gameState;
     }
 }
 class StartView extends ViewBase {

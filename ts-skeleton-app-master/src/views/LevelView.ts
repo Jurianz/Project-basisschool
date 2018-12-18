@@ -12,7 +12,7 @@ class LevelView extends ViewBase {
         "./assets/images/blocks/purpleBlock.png",
         "./assets/images/blocks/yellowBlock.png"
     ];
-    
+
 
     public constructor() {
         super();
@@ -69,10 +69,26 @@ class LevelView extends ViewBase {
                 location.reload();
             }
 
+
             if (this.blockArray.length == 15) {
                 this.gameState = "QUESTION";
+                document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
+                document.body.style.backgroundSize = "cover";
+                document.body.style.zIndex = "-2";
                 const question = new Question();
+                window.setInterval(question.createScreen, 1000 / 60)
+                if (question.getGameState() === "PLAY") {
+                    this.compareAnswers()
+                    this.gameState = "PLAY";
+                }
             }
         }
     }
+
+    compareAnswers = () => {
+        document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.zIndex = "-2";
+    }
 }
+
