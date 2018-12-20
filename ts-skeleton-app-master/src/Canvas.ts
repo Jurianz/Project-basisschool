@@ -1,14 +1,14 @@
-class Canvas{
+class Canvas {
 
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
 
     constructor(
         canvas: HTMLCanvasElement
-        ) {
+    ) {
         this.canvas = canvas;
         this.canvas.width = window.innerWidth;
-        this.canvas.height= window.innerHeight;
+        this.canvas.height = window.innerHeight;
         this.ctx = this.canvas.getContext('2d');
     }
 
@@ -34,12 +34,12 @@ class Canvas{
         xCoordinate: number,
         yCoordinate: number,
         color: string,
-        aligment: CanvasTextAlign= "center"
-        ) {
+        aligment: CanvasTextAlign = "center"
+    ) {
         this.ctx.font = `${fontSize}px Mars`;
         this.ctx.fillStyle = color;
         this.ctx.textAlign = aligment;
-        this.ctx.fillText(text,xCoordinate,yCoordinate);  
+        this.ctx.fillText(text, xCoordinate, yCoordinate);
     }
 
     /**
@@ -52,13 +52,13 @@ class Canvas{
         src: string,
         xCoordinate: number,
         yCoordinate: number
-        ) {
+    ) {
         let element = document.createElement("img");
         element.src = src;
         element.style.zIndex = "-1";
 
         element.addEventListener("load", () => {
-            this.ctx.drawImage(element,xCoordinate,yCoordinate);
+            this.ctx.drawImage(element, xCoordinate, yCoordinate);
         });
     }
 
@@ -71,11 +71,11 @@ class Canvas{
         min: number,
         max: number): number {
 
-        return Math.round(Math.random() * (max - min )+ min);
+        return Math.round(Math.random() * (max - min) + min);
     }
 
-    public getCenter(): {X: number, Y: number} {
-    return {X: this.canvas.width / 2, Y: this.canvas.height / 2}
+    public getCenter(): { X: number, Y: number } {
+        return { X: this.canvas.width / 2, Y: this.canvas.height / 2 }
     }
 
     public writeButtonToCanvas(src: string) {
@@ -92,19 +92,23 @@ class Canvas{
 
         this.canvas.addEventListener("click", (event: MouseEvent) => {
             if (event.x > horizontalCenter - 150 && event.x < horizontalCenter + 150) {
-                if (event.y > verticalCenter -180 && event.y < verticalCenter - 124) {
+                if (event.y > verticalCenter - 180 && event.y < verticalCenter - 124) {
                     this.clearCanvas()
-                    const levelView = new LevelView();
+                    this.writeTextToCanvas(`${window.setTimeout(this.startGame, 2000)}`, 100, this.getCenter().X, this.getCenter().Y, "white")
                 }
             }
         });
     };
 
-    public getHeight() : number {
+    public startGame() {
+        const levelView = new LevelView();
+    }
+
+    public getHeight(): number {
         return this.canvas.height
     };
 
-    public getWidth() : number {
+    public getWidth(): number {
         return this.canvas.width
     };
 }

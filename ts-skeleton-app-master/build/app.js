@@ -110,12 +110,15 @@ class Canvas {
             if (event.x > horizontalCenter - 150 && event.x < horizontalCenter + 150) {
                 if (event.y > verticalCenter - 180 && event.y < verticalCenter - 124) {
                     this.clearCanvas();
-                    const levelView = new LevelView();
+                    this.writeTextToCanvas(`${window.setTimeout(this.startGame, 2000)}`, 100, this.getCenter().X, this.getCenter().Y, "white");
                 }
             }
         });
     }
     ;
+    startGame() {
+        const levelView = new LevelView();
+    }
     getHeight() {
         return this.canvas.height;
     }
@@ -306,34 +309,32 @@ class LevelView extends ViewBase {
                     if (this.ball.isCollidingWithBlock(this.blockArray[index])) {
                         this.ball.collidedWithBlock();
                         this.blockArray.splice(index, 1);
-                        if (this.blockArray.length == 12 || this.blockArray.length == 9 || this.blockArray.length == 6 || this.blockArray.length == 3) {
-                            this.questionAnswer = null;
-                            this.numberRandom = this.canvas.randomNumber(0, this.questions.length - 1);
-                            this.gameState = "QUESTION";
-                            document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
-                            document.body.style.backgroundSize = "cover";
-                            document.body.style.zIndex = "-1";
-                        }
+                        this.questionAnswer = null;
+                        this.numberRandom = this.canvas.randomNumber(0, this.difficultQuestions.length - 1);
+                        this.gameState = "QUESTION";
+                        document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
+                        document.body.style.backgroundSize = "cover";
+                        document.body.style.zIndex = "-1";
                     }
                 }
             }
             if (this.gameState === "QUESTION") {
                 this.canvas.clearCanvas();
-                this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 50, 165);
-                this.canvas.writeTextToCanvas(this.questions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
-                this.canvas.writeTextToCanvas(` 1: ${this.questions[this.numberRandom].a}`, 50, this.canvas.getCenter().X + 100, 200, "white", "left");
-                this.canvas.writeTextToCanvas(`2: ${this.questions[this.numberRandom].b}`, 50, this.canvas.getCenter().X + 100, 300, "white", "left");
-                this.canvas.writeTextToCanvas(`3: ${this.questions[this.numberRandom].c}`, 50, this.canvas.getCenter().X + 100, 400, "white", "left");
+                this.canvas.writeImageToCanvas(`./assets/images/question/${this.difficultQuestions[this.numberRandom].picture}`, 25, 150);
+                this.canvas.writeTextToCanvas(this.difficultQuestions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
+                this.canvas.writeTextToCanvas(` 1: ${this.difficultQuestions[this.numberRandom].a}`, 50, this.canvas.getCenter().X, 295, "white", "left");
+                this.canvas.writeTextToCanvas(`2: ${this.difficultQuestions[this.numberRandom].b}`, 50, this.canvas.getCenter().X, 395, "white", "left");
+                this.canvas.writeTextToCanvas(`3: ${this.difficultQuestions[this.numberRandom].c}`, 50, this.canvas.getCenter().X, 495, "white", "left");
                 if (this.keyBoardListener.getOnePressed()) {
-                    this.questionAnswer = this.questions[this.numberRandom].a;
+                    this.questionAnswer = this.difficultQuestions[this.numberRandom].a;
                     this.compareAnswers();
                 }
                 if (this.keyBoardListener.getTwoPressed()) {
-                    this.questionAnswer = this.questions[this.numberRandom].b;
+                    this.questionAnswer = this.difficultQuestions[this.numberRandom].b;
                     this.compareAnswers();
                 }
                 if (this.keyBoardListener.getThreePressed()) {
-                    this.questionAnswer = this.questions[this.numberRandom].c;
+                    this.questionAnswer = this.difficultQuestions[this.numberRandom].c;
                     this.compareAnswers();
                 }
             }
@@ -347,11 +348,13 @@ class LevelView extends ViewBase {
             }
         };
         this.compareAnswers = () => {
-            if (this.questions[this.numberRandom].answer === this.questionAnswer) {
+            if (this.difficultQuestions[this.numberRandom].answer === this.questionAnswer) {
                 alert('Goed gedaan! Je antwoord was goed (LET OP: Het spel gaat meteen verder!)');
+                this.difficultQuestions.splice(this.numberRandom, 1);
             }
             else {
-                alert(`Helaas! Het goede antwoord was ${this.questions[this.numberRandom].answer} (LET OP: Het spel gaat meteen verder!)`);
+                alert(`Helaas! Het goede antwoord was ${this.difficultQuestions[this.numberRandom].answer} (LET OP: Het spel gaat meteen verder!)`);
+                this.difficultQuestions.splice(this.numberRandom, 1);
             }
             this.gameState = "PLAY";
             this.canvas.clearCanvas();
@@ -387,7 +390,7 @@ class LevelView extends ViewBase {
             new Block(canvasElement, this.imageArray[1], 960, 100, 184, 61),
             new Block(canvasElement, this.imageArray[1], 1150, 100, 184, 61),
             new Block(canvasElement, this.imageArray[1], 1340, 100, 184, 61)];
-        this.questions = [
+        this.easyQuestions = [
             {
                 question: "Welke van de volgende steden ligt in Engeland?",
                 a: "München",
@@ -403,33 +406,12 @@ class LevelView extends ViewBase {
                 answer: "Rijn",
                 picture: "rijn.png"
             }, {
-                question: "Welk gebergte grenst tussen Frankrijk en Spanje?",
-                a: "Pyreneeën",
-                b: "Alpen",
-                c: "Ardennen",
-                answer: "Pyreneeën",
-                picture: "pyreneeen.png"
-            }, {
                 question: "Wat is de hoofdstad van Frankrijk?",
                 a: "Monaco",
                 b: "Lyon",
                 c: "Parijs",
                 answer: "Parijs",
                 picture: "france.png"
-            }, {
-                question: "Hoe noem je de landen in Noord-Europa ook wel?",
-                a: "Scandinavië",
-                b: "Benelux",
-                c: "Balkanlanden",
-                answer: "Scandinavië",
-                picture: "fjord.png"
-            }, {
-                question: "Wat is de hoofdstad van Noorwegen?",
-                a: "Stockholm",
-                b: "Oslo",
-                c: "Helsinki",
-                answer: "Oslo",
-                picture: "norway.png"
             }, {
                 question: "Wat is het meest voorkomende klimaat van West-Europa?",
                 a: "Landklimaat",
@@ -444,6 +426,156 @@ class LevelView extends ViewBase {
                 c: "Goed",
                 answer: "Goed",
                 picture: "north_europe.png"
+            }, {
+                question: "Welk land ligt net onder de poolcirkel?",
+                a: "Scandinavië",
+                b: "IJsland",
+                c: "Nederland",
+                answer: "IJsland",
+                picture: ""
+            }, {
+                question: "Als iets belangrijk is voor meerdere landen, hoe noem je dat dan?",
+                a: "Regionaal",
+                b: "Nationaal",
+                c: "Internationaal",
+                answer: "Internationaal",
+                picture: ""
+            }, {
+                question: "Welke hoort hier niet bij?",
+                a: "Beroepsbevolking",
+                b: "Gastarbeiders",
+                c: "Wereldstad",
+                answer: "Wereldstad",
+                picture: "wereldstad.png"
+            }, {
+                question: "Welke zee grenst aan Nederland?",
+                a: "De middelandse zee",
+                b: "De rode zee",
+                c: "De noordzee",
+                answer: "De noordzee",
+                picture: "zee.png"
+            }, {
+                question: "Wat spuit water heel hoog de lucht in?",
+                a: "Geiser",
+                b: "Fjord",
+                c: "Vulkaan",
+                answer: "Geiser",
+                picture: "geiser.png"
+            }, {
+                question: "Hoe noem je het verschijnsel wat leidt tot verdwijnen van vis in de zee?",
+                a: "Onderbevissing",
+                b: "Overbevissing",
+                c: "Scheepvaart",
+                answer: "Overbevissing",
+                picture: "vis.png"
+            }, {
+                question: "Hoe noem je een bos, wat alleen wordt gebruikt voor het hout?",
+                a: "Mangrovebos",
+                b: "Jungle",
+                c: "Productiebos",
+                answer: "Productiebos",
+                picture: "bos.png"
+            }
+        ];
+        this.difficultQuestions = [
+            {
+                question: "Welk gebergte grenst aan Frankrijk en Spanje?",
+                a: "Pyreneeën",
+                b: "Alpen",
+                c: "Ardennen",
+                answer: "Pyreneeën",
+                picture: "pyreneeen.png"
+            }, {
+                question: "Hoe noem je de landen in Noord-Europa ook wel?",
+                a: "Scandinavië",
+                b: "Benelux",
+                c: "Baltische Staten",
+                answer: "Scandinavië",
+                picture: "scandinavie.png"
+            }, {
+                question: "Wat is de hoofdstad van Noorwegen?",
+                a: "Stockholm",
+                b: "Oslo",
+                c: "Helsinki",
+                answer: "Oslo",
+                picture: "norway.png"
+            }, {
+                question: "Wat is de grootste stad van West-Europa?",
+                a: "Parijs",
+                b: "Amsterdam",
+                c: "Londen",
+                answer: "Londen",
+                picture: "londen.png"
+            }, {
+                question: "Met welk vervoersmiddel rijden mensen vaak in de stad?",
+                a: "Auto",
+                b: "Taxi",
+                c: "Metro",
+                answer: "Metro",
+                picture: "traffic.png"
+            }, {
+                question: "Welke buurlanden heeft België naast Nederland en Duitsland?",
+                a: "Frankrijk",
+                b: "Frankrijk en Luxemburg",
+                c: "Frankrijk en Engeland",
+                answer: "Frankrijk en Luxemburg",
+                picture: "belgium.png"
+            }, {
+                question: "Waar ligt Schotland in Groot-Brittanië?",
+                a: "In het noorden",
+                b: "in het midden",
+                c: "in het zuiden",
+                answer: "In het noorden",
+                picture: "schotland.png"
+            }, {
+                question: "Waar bestaat IJsland voor het grootste deel uit?",
+                a: "Woestijn",
+                b: "IJs",
+                c: "Toendra",
+                answer: "Toendra",
+                picture: "ijsland.png"
+            }, {
+                question: "Welke landen horen niet bij de Eurozone?",
+                a: "Noorwegen en Finland",
+                b: "Noorwegen en IJsland",
+                c: "IJsland en Frankrijk",
+                answer: "Noorwegen en IJsland",
+                picture: "eurozone.png"
+            }, {
+                question: "Wat zijn Estland, Letland en Litouwen?",
+                a: "Baltische Staten",
+                b: "Balkanlanden",
+                c: "Benelux",
+                answer: "Baltische Staten",
+                picture: "baltischestaten.png"
+            }, {
+                question: "Waar waren Estland, Letland en Litouwen vroeger onderdeel van?",
+                a: "Scandinavië",
+                b: "Balkanlanden",
+                c: "Sovjet Unie",
+                answer: "Sovjet Unie",
+                picture: "sovjetunie.png"
+            }, {
+                question: "De waddeneilanden zijn een goed voorbeeld van?",
+                a: "Kliffen",
+                b: "Afbraakkust",
+                c: "Aangroeikust",
+                answer: "Aangroeikust",
+                picture: "waddeneilanden.png"
+            }, {
+                question: "Hoe heet het achterland van Rotterdam?",
+                a: "Ruhrgebied",
+                b: "Ardennen",
+                c: "Achterhoek",
+                answer: "Ruhrgebied",
+                picture: "ruhrarea.png"
+            }, {
+                question: "Waarom is er in Rotterdam veel werkgelegenheid?",
+                a: "Chemische industrie",
+                b: "Vee-industrie",
+                c: "Levensmiddelen industrie",
+                answer: "Chemische industrie",
+                picture: "rotterdam.png"
             }
         ];
         window.setInterval(this.createScreen, 1000 / 60);
