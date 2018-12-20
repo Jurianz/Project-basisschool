@@ -12,8 +12,8 @@ class Ball extends Entity {
         yPos: number,
         width: number,
         height: number,
-        dPos: number = -4,
-        wPos: number = 4
+        dPos: number = -5,
+        wPos: number = 5
     ) {
         super(canvas, imgSource, xPos, yPos, width, height);
         this.dPos = dPos;
@@ -46,14 +46,30 @@ class Ball extends Entity {
         return false;
     }
 
-    public collidedWithPlayer() {
-        this.wPos = 4;
+    public collidedWithPlayerLeft() {
+        this.wPos = 5;
+        this.dPos -= 4;
+        if (this.dPos < -6) {
+            this.dPos = -6;
+        }
+    }
+
+    public collidedWithPlayerMiddle() {
+        this.wPos = 5;
+    }
+
+    public collidedWithPlayerRight() {
+        this.wPos = 5;
+        this.dPos += 4;
+        if (this.dPos > 6) {
+            this.dPos = 6;
+        }
     }
 
     public removeLife() {
-        this.wPos = -this.wPos;
-        this.xPos = this.canvas.getCenter().X;
+        this.wPos = 4;
         this.yPos = this.canvas.getCenter().Y;
+        this.dPos = this.canvas.randomNumber(-5, 5)
     }
 
     public collidedWithBlock() {

@@ -94,15 +94,30 @@ class Canvas {
             if (event.x > horizontalCenter - 150 && event.x < horizontalCenter + 150) {
                 if (event.y > verticalCenter - 180 && event.y < verticalCenter - 124) {
                     this.clearCanvas()
-                    this.writeTextToCanvas(`${window.setTimeout(this.startGame, 2000)}`, 100, this.getCenter().X, this.getCenter().Y, "white")
+                    this.startCountdown(3);
                 }
             }
         });
     };
 
-    public startGame() {
-        const levelView = new LevelView();
-    }
+    public startCountdown(seconds: number) {
+        var counter = seconds;
+        this.writeTextToCanvas('World Explorer', 100, this.getCenter().X, 100, "white", "center");
+
+        var interval = setInterval(() => {
+            this.clearCanvas();
+            this.writeTextToCanvas('World Explorer', 100, this.getCenter().X, 100, "white", "center");
+            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y - 75, "white")
+            counter--;
+
+
+            if (counter < 0) {
+
+                clearInterval(interval);
+                const levelView = new LevelView();
+            };
+        }, 1000);
+    };
 
     public getHeight(): number {
         return this.canvas.height

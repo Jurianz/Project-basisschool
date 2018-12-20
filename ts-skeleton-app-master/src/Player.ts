@@ -23,10 +23,10 @@ class Player extends Entity {
 
     public move(): void {
         if (this.keyBoardListener.getLeftPressed()) {
-            this.xPos -= 6;
+            this.xPos -= 8;
         }
         if (this.keyBoardListener.getRightPressed()) {
-            this.xPos += 6;
+            this.xPos += 8;
         }
         if (this.xPos < 0) {
             this.xPos = 0;
@@ -36,10 +36,35 @@ class Player extends Entity {
         }
     }
 
-    public isCollidingWithBall(enemy: Ball): boolean {
+    public isCollidingWithBallLeft(enemy: Ball): boolean {
         if (
             this.getX() < enemy.getX() + enemy.getWidth() &&
-            this.getX() + this.getWidth() > enemy.getX() &&
+            this.getX() + this.getWidth() * (1 / 3) > enemy.getX() &&
+            this.getY() < enemy.getY() + enemy.getHeight() &&
+            this.getY() + this.getHeight() > enemy.getY()
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public isCollidingWithBallMiddle(enemy: Ball): boolean {
+        if (
+            this.getX() + 67 < enemy.getX() + enemy.getWidth() &&
+            this.getX() + this.getWidth() * (2 / 3) > enemy.getX() &&
+            this.getY() < enemy.getY() + enemy.getHeight() &&
+            this.getY() + this.getHeight() > enemy.getY()
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public isCollidingWithBallRight(enemy: Ball): boolean {
+        if (
+            this.getX() + 134 < enemy.getX() + enemy.getWidth() &&
+            this.getX() + this.getWidth() * (3 / 3) > enemy.getX() &&
             this.getY() < enemy.getY() + enemy.getHeight() &&
             this.getY() + this.getHeight() > enemy.getY()
         ) {
@@ -56,7 +81,7 @@ class Player extends Entity {
         this.lives -= 1
         if (this.lives == 0) {
             alert('Game over')
-            location.reload();  
+            location.reload();
         }
     }
 }

@@ -24,7 +24,7 @@ class Entity {
     }
 }
 class Ball extends Entity {
-    constructor(canvas, imgSource, xPos, yPos, width, height, dPos = -4, wPos = 4) {
+    constructor(canvas, imgSource, xPos, yPos, width, height, dPos = -5, wPos = 5) {
         super(canvas, imgSource, xPos, yPos, width, height);
         this.dPos = dPos;
         this.wPos = wPos;
@@ -51,13 +51,27 @@ class Ball extends Entity {
         }
         return false;
     }
-    collidedWithPlayer() {
-        this.wPos = 4;
+    collidedWithPlayerLeft() {
+        this.wPos = 5;
+        this.dPos -= 4;
+        if (this.dPos < -6) {
+            this.dPos = -6;
+        }
+    }
+    collidedWithPlayerMiddle() {
+        this.wPos = 5;
+    }
+    collidedWithPlayerRight() {
+        this.wPos = 5;
+        this.dPos += 4;
+        if (this.dPos > 6) {
+            this.dPos = 6;
+        }
     }
     removeLife() {
-        this.wPos = -this.wPos;
-        this.xPos = this.canvas.getCenter().X;
+        this.wPos = 4;
         this.yPos = this.canvas.getCenter().Y;
+        this.dPos = this.canvas.randomNumber(-5, 5);
     }
     collidedWithBlock() {
         this.wPos = -this.wPos;
@@ -110,15 +124,28 @@ class Canvas {
             if (event.x > horizontalCenter - 150 && event.x < horizontalCenter + 150) {
                 if (event.y > verticalCenter - 180 && event.y < verticalCenter - 124) {
                     this.clearCanvas();
-                    this.writeTextToCanvas(`${window.setTimeout(this.startGame, 2000)}`, 100, this.getCenter().X, this.getCenter().Y, "white");
+                    this.startCountdown(3);
                 }
             }
         });
     }
     ;
-    startGame() {
-        const levelView = new LevelView();
+    startCountdown(seconds) {
+        var counter = seconds;
+        this.writeTextToCanvas('World Explorer', 100, this.getCenter().X, 100, "white", "center");
+        var interval = setInterval(() => {
+            this.clearCanvas();
+            this.writeTextToCanvas('World Explorer', 100, this.getCenter().X, 100, "white", "center");
+            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y - 75, "white");
+            counter--;
+            if (counter < 0) {
+                clearInterval(interval);
+                const levelView = new LevelView();
+            }
+            ;
+        }, 1000);
     }
+    ;
     getHeight() {
         return this.canvas.height;
     }
@@ -216,10 +243,10 @@ class Player extends Entity {
     }
     move() {
         if (this.keyBoardListener.getLeftPressed()) {
-            this.xPos -= 6;
+            this.xPos -= 8;
         }
         if (this.keyBoardListener.getRightPressed()) {
-            this.xPos += 6;
+            this.xPos += 8;
         }
         if (this.xPos < 0) {
             this.xPos = 0;
@@ -228,9 +255,27 @@ class Player extends Entity {
             this.xPos = window.innerWidth - (this.getWidth());
         }
     }
-    isCollidingWithBall(enemy) {
+    isCollidingWithBallLeft(enemy) {
         if (this.getX() < enemy.getX() + enemy.getWidth() &&
-            this.getX() + this.getWidth() > enemy.getX() &&
+            this.getX() + this.getWidth() * (1 / 3) > enemy.getX() &&
+            this.getY() < enemy.getY() + enemy.getHeight() &&
+            this.getY() + this.getHeight() > enemy.getY()) {
+            return true;
+        }
+        return false;
+    }
+    isCollidingWithBallMiddle(enemy) {
+        if (this.getX() + 67 < enemy.getX() + enemy.getWidth() &&
+            this.getX() + this.getWidth() * (2 / 3) > enemy.getX() &&
+            this.getY() < enemy.getY() + enemy.getHeight() &&
+            this.getY() + this.getHeight() > enemy.getY()) {
+            return true;
+        }
+        return false;
+    }
+    isCollidingWithBallRight(enemy) {
+        if (this.getX() + 134 < enemy.getX() + enemy.getWidth() &&
+            this.getX() + this.getWidth() * (3 / 3) > enemy.getX() &&
             this.getY() < enemy.getY() + enemy.getHeight() &&
             this.getY() + this.getHeight() > enemy.getY()) {
             return true;
@@ -301,30 +346,42 @@ class LevelView extends ViewBase {
                 this.ball.move();
                 this.ball.draw();
                 this.canvas.writeTextToCanvas(`lives: ${this.player.getLives()}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
-                if (this.player.isCollidingWithBall(this.ball)) {
-                    this.ball.collidedWithPlayer();
+                if (this.player.isCollidingWithBallLeft(this.ball)) {
+                    this.ball.collidedWithPlayerLeft();
+                }
+                if (this.player.isCollidingWithBallMiddle(this.ball)) {
+                    this.ball.collidedWithPlayerMiddle();
+                }
+                if (this.player.isCollidingWithBallRight(this.ball)) {
+                    this.ball.collidedWithPlayerRight();
                 }
                 for (let index = 0; index < this.blockArray.length; index++) {
                     this.blockArray[index].draw();
                     if (this.ball.isCollidingWithBlock(this.blockArray[index])) {
                         this.ball.collidedWithBlock();
                         this.blockArray.splice(index, 1);
-                        this.questionAnswer = null;
-                        this.numberRandom = this.canvas.randomNumber(0, this.difficultQuestions.length - 1);
-                        this.gameState = "QUESTION";
-                        document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
-                        document.body.style.backgroundSize = "cover";
-                        document.body.style.zIndex = "-1";
+                        if (this.blockArray.length < 1) {
+                            alert('Goed gedaan!');
+                            location.reload();
+                        }
+                        if (this.blockArray.length == 12 || this.blockArray.length == 9 || this.blockArray.length == 6 || this.blockArray.length == 3) {
+                            this.questionAnswer = null;
+                            this.numberRandom = this.canvas.randomNumber(0, this.difficultQuestions.length - 1);
+                            this.gameState = "QUESTION";
+                            document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
+                            document.body.style.backgroundSize = "cover";
+                            document.body.style.zIndex = "-1";
+                        }
                     }
                 }
             }
             if (this.gameState === "QUESTION") {
                 this.canvas.clearCanvas();
-                this.canvas.writeImageToCanvas(`./assets/images/question/${this.difficultQuestions[this.numberRandom].picture}`, 25, 150);
+                this.canvas.writeImageToCanvas(`./assets/images/question/${this.difficultQuestions[this.numberRandom].picture}`, 25, 210);
                 this.canvas.writeTextToCanvas(this.difficultQuestions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
-                this.canvas.writeTextToCanvas(` 1: ${this.difficultQuestions[this.numberRandom].a}`, 50, this.canvas.getCenter().X, 295, "white", "left");
-                this.canvas.writeTextToCanvas(`2: ${this.difficultQuestions[this.numberRandom].b}`, 50, this.canvas.getCenter().X, 395, "white", "left");
-                this.canvas.writeTextToCanvas(`3: ${this.difficultQuestions[this.numberRandom].c}`, 50, this.canvas.getCenter().X, 495, "white", "left");
+                this.canvas.writeTextToCanvas(` 1: ${this.difficultQuestions[this.numberRandom].a}`, 50, this.canvas.getCenter().X - 25, 295, "white", "left");
+                this.canvas.writeTextToCanvas(`2: ${this.difficultQuestions[this.numberRandom].b}`, 50, this.canvas.getCenter().X - 25, 395, "white", "left");
+                this.canvas.writeTextToCanvas(`3: ${this.difficultQuestions[this.numberRandom].c}`, 50, this.canvas.getCenter().X - 25, 495, "white", "left");
                 if (this.keyBoardListener.getOnePressed()) {
                     this.questionAnswer = this.difficultQuestions[this.numberRandom].a;
                     this.compareAnswers();
@@ -337,10 +394,6 @@ class LevelView extends ViewBase {
                     this.questionAnswer = this.difficultQuestions[this.numberRandom].c;
                     this.compareAnswers();
                 }
-            }
-            if (this.blockArray.length < 1) {
-                alert('Goed gedaan!');
-                location.reload();
             }
             if (this.ball.getY() + this.ball.getHeight() > this.canvas.getHeight()) {
                 this.player.removeLife();
@@ -372,8 +425,8 @@ class LevelView extends ViewBase {
         document.body.style.backgroundSize = "cover";
         document.body.style.zIndex = "-1";
         this.canvas = new Canvas(canvasElement);
-        this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", 500, this.canvas.getHeight() - 30, 200, 25);
-        this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", 900, 500, 35, 35);
+        this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", this.canvas.getCenter().X - 100, this.canvas.getHeight() - 30, 200, 25);
+        this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", this.canvas.getCenter().X, 500, 35, 35);
         this.blockArray = [new Block(canvasElement, this.imageArray[1], 10, 30, 184, 61),
             new Block(canvasElement, this.imageArray[1], 200, 30, 184, 61),
             new Block(canvasElement, this.imageArray[1], 390, 30, 184, 61),
@@ -432,14 +485,14 @@ class LevelView extends ViewBase {
                 b: "IJsland",
                 c: "Nederland",
                 answer: "IJsland",
-                picture: ""
+                picture: "poolcirkel.png"
             }, {
                 question: "Als iets belangrijk is voor meerdere landen, hoe noem je dat dan?",
                 a: "Regionaal",
                 b: "Nationaal",
                 c: "Internationaal",
                 answer: "Internationaal",
-                picture: ""
+                picture: "internationaal.png"
             }, {
                 question: "Welke hoort hier niet bij?",
                 a: "Beroepsbevolking",
@@ -475,6 +528,13 @@ class LevelView extends ViewBase {
                 c: "Productiebos",
                 answer: "Productiebos",
                 picture: "bos.png"
+            }, {
+                question: "Waaruit bestaat de kust van Noorwegen?",
+                a: "Duinen",
+                b: "Fjorden",
+                c: "Dijken",
+                answer: "Fjorden",
+                picture: "fjord.png"
             }
         ];
         this.difficultQuestions = [
