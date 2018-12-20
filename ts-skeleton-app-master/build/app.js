@@ -24,7 +24,7 @@ class Entity {
     }
 }
 class Ball extends Entity {
-    constructor(canvas, imgSource, xPos, yPos, width, height, dPos = -6, wPos = 6) {
+    constructor(canvas, imgSource, xPos, yPos, width, height, dPos = -4, wPos = 4) {
         super(canvas, imgSource, xPos, yPos, width, height);
         this.dPos = dPos;
         this.wPos = wPos;
@@ -52,7 +52,7 @@ class Ball extends Entity {
         return false;
     }
     collidedWithPlayer() {
-        this.wPos = 6;
+        this.wPos = 4;
     }
     removeLife() {
         this.wPos = -this.wPos;
@@ -199,6 +199,11 @@ class KeyBoardListener {
     getThreePressed() {
         return this.threePressed;
     }
+    resetAnswer() {
+        this.onePressed = false;
+        this.twoPressed = false;
+        this.threePressed = false;
+    }
 }
 class Player extends Entity {
     constructor(canvas, imgSource, xPos, yPos, width, height, lives = 3) {
@@ -242,7 +247,6 @@ class Player extends Entity {
 }
 class ViewBase {
     constructor() {
-        this.gameState = "PLAY";
     }
     render() {
         this.canvas.clearCanvas();
@@ -294,10 +298,6 @@ class LevelView extends ViewBase {
                 this.ball.move();
                 this.ball.draw();
                 this.canvas.writeTextToCanvas(`lives: ${this.player.getLives()}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
-                if (this.ball.getY() + this.ball.getHeight() > this.canvas.getHeight()) {
-                    this.player.removeLife();
-                    this.ball.removeLife();
-                }
                 if (this.player.isCollidingWithBall(this.ball)) {
                     this.ball.collidedWithPlayer();
                 }
@@ -306,35 +306,68 @@ class LevelView extends ViewBase {
                     if (this.ball.isCollidingWithBlock(this.blockArray[index])) {
                         this.ball.collidedWithBlock();
                         this.blockArray.splice(index, 1);
-                    }
-                }
-                if (this.blockArray.length < 1) {
-                    alert('Goed gedaan!');
-                    location.reload();
-                }
-                if (this.blockArray.length == 15) {
-                    this.gameState = "QUESTION";
-                    document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
-                    document.body.style.backgroundSize = "cover";
-                    document.body.style.zIndex = "-2";
-                    const question = new Question();
-                    window.setInterval(question.createScreen, 1000 / 60);
-                    if (question.getGameState() === "PLAY") {
-                        this.compareAnswers();
-                        this.gameState = "PLAY";
+                        if (this.blockArray.length == 12 || this.blockArray.length == 9 || this.blockArray.length == 6 || this.blockArray.length == 3) {
+                            this.questionAnswer = null;
+                            this.numberRandom = this.canvas.randomNumber(0, this.questions.length - 1);
+                            this.gameState = "QUESTION";
+                            document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
+                            document.body.style.backgroundSize = "cover";
+                            document.body.style.zIndex = "-1";
+                        }
                     }
                 }
             }
+            if (this.gameState === "QUESTION") {
+                this.canvas.clearCanvas();
+                this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 50, 165);
+                this.canvas.writeTextToCanvas(this.questions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
+                this.canvas.writeTextToCanvas(` 1: ${this.questions[this.numberRandom].a}`, 50, this.canvas.getCenter().X + 100, 200, "white", "left");
+                this.canvas.writeTextToCanvas(`2: ${this.questions[this.numberRandom].b}`, 50, this.canvas.getCenter().X + 100, 300, "white", "left");
+                this.canvas.writeTextToCanvas(`3: ${this.questions[this.numberRandom].c}`, 50, this.canvas.getCenter().X + 100, 400, "white", "left");
+                if (this.keyBoardListener.getOnePressed()) {
+                    this.questionAnswer = this.questions[this.numberRandom].a;
+                    this.compareAnswers();
+                }
+                if (this.keyBoardListener.getTwoPressed()) {
+                    this.questionAnswer = this.questions[this.numberRandom].b;
+                    this.compareAnswers();
+                }
+                if (this.keyBoardListener.getThreePressed()) {
+                    this.questionAnswer = this.questions[this.numberRandom].c;
+                    this.compareAnswers();
+                }
+            }
+            if (this.blockArray.length < 1) {
+                alert('Goed gedaan!');
+                location.reload();
+            }
+            if (this.ball.getY() + this.ball.getHeight() > this.canvas.getHeight()) {
+                this.player.removeLife();
+                this.ball.removeLife();
+            }
         };
         this.compareAnswers = () => {
+            if (this.questions[this.numberRandom].answer === this.questionAnswer) {
+                alert('Goed gedaan! Je antwoord was goed (LET OP: Het spel gaat meteen verder!)');
+            }
+            else {
+                alert(`Helaas! Het goede antwoord was ${this.questions[this.numberRandom].answer} (LET OP: Het spel gaat meteen verder!)`);
+            }
+            this.gameState = "PLAY";
+            this.canvas.clearCanvas();
+            this.keyBoardListener.resetAnswer();
             document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
             document.body.style.backgroundSize = "cover";
-            document.body.style.zIndex = "-2";
+            document.body.style.zIndex = "-1";
         };
+        const canvasElement = document.getElementById('canvas');
+        this.canvas = new Canvas(canvasElement);
+        this.keyBoardListener = new KeyBoardListener();
+        this.questionAnswer = null;
+        this.gameState = "PLAY";
         document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-2";
-        const canvasElement = document.getElementById('canvas');
+        document.body.style.zIndex = "-1";
         this.canvas = new Canvas(canvasElement);
         this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", 500, this.canvas.getHeight() - 30, 200, 25);
         this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", 900, 500, 35, 35);
@@ -354,99 +387,66 @@ class LevelView extends ViewBase {
             new Block(canvasElement, this.imageArray[1], 960, 100, 184, 61),
             new Block(canvasElement, this.imageArray[1], 1150, 100, 184, 61),
             new Block(canvasElement, this.imageArray[1], 1340, 100, 184, 61)];
-        window.setInterval(this.createScreen, 1000 / 60);
-    }
-}
-class Question extends ViewBase {
-    constructor() {
-        super();
-        this.createScreen = () => {
-            this.canvas.clearCanvas();
-            this.canvas.writeTextToCanvas(this.questions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
-            this.canvas.writeTextToCanvas(` 1: ${this.questions[this.numberRandom].a}`, 50, this.canvas.getCenter().X + 100, 200, "white", "left");
-            this.canvas.writeTextToCanvas(`2: ${this.questions[this.numberRandom].b}`, 50, this.canvas.getCenter().X + 100, 300, "white", "left");
-            this.canvas.writeTextToCanvas(`3: ${this.questions[this.numberRandom].c}`, 50, this.canvas.getCenter().X + 100, 400, "white", "left");
-            if (this.keyBoardListener.getOnePressed()) {
-                this.questionAnswer = this.questions[this.numberRandom].a;
-            }
-            if (this.keyBoardListener.getTwoPressed()) {
-                this.questionAnswer = this.questions[this.numberRandom].b;
-            }
-            if (this.keyBoardListener.getThreePressed()) {
-                this.questionAnswer = this.questions[this.numberRandom].c;
-            }
-            if (this.questionAnswer !== null) {
-                if (this.questions[this.numberRandom].answer === this.questionAnswer) {
-                    alert("Goed gedaan");
-                    location.reload();
-                    this.gameState = "PLAY";
-                }
-                else {
-                    alert("Helaas");
-                    location.reload();
-                }
-            }
-        };
-        const canvasElement = document.getElementById('canvas');
-        this.canvas = new Canvas(canvasElement);
-        this.keyBoardListener = new KeyBoardListener();
-        this.gameState = "QUESTION";
-        this.questionAnswer = null;
         this.questions = [
             {
                 question: "Welke van de volgende steden ligt in Engeland?",
                 a: "München",
                 b: "Liverpool",
                 c: "Monaco",
-                answer: "Liverpool"
+                answer: "Liverpool",
+                picture: "england.png"
             }, {
                 question: "Welke rivier begint in Frankrijk en loopt door naar Belgie en Nederland?",
                 a: "Rijn",
                 b: "Seine",
                 c: "Rhône",
-                answer: "Rijn"
+                answer: "Rijn",
+                picture: "rijn.png"
             }, {
-                question: "Welke gebergte grenst tussen Frankrijk en Spanje?",
+                question: "Welk gebergte grenst tussen Frankrijk en Spanje?",
                 a: "Pyreneeën",
                 b: "Alpen",
                 c: "Ardennen",
-                answer: "Pyreneeën"
+                answer: "Pyreneeën",
+                picture: "pyreneeen.png"
             }, {
                 question: "Wat is de hoofdstad van Frankrijk?",
                 a: "Monaco",
                 b: "Lyon",
                 c: "Parijs",
-                answer: "Parijs"
+                answer: "Parijs",
+                picture: "france.png"
             }, {
                 question: "Hoe noem je de landen in Noord-Europa ook wel?",
                 a: "Scandinavië",
                 b: "Benelux",
                 c: "Balkanlanden",
-                answer: "Scandinavië"
+                answer: "Scandinavië",
+                picture: "fjord.png"
             }, {
                 question: "Wat is de hoofdstad van Noorwegen?",
                 a: "Stockholm",
                 b: "Oslo",
                 c: "Helsinki",
-                answer: "Oslo"
+                answer: "Oslo",
+                picture: "norway.png"
             }, {
                 question: "Wat is het meest voorkomende klimaat van West-Europa?",
                 a: "Landklimaat",
-                b: "Tropisch limaat",
+                b: "Tropisch klimaat",
                 c: "Zeeklimaat",
-                answer: "Zeeklimaat"
+                answer: "Zeeklimaat",
+                picture: "west_europe.png"
             }, {
                 question: "Hoe is de welvaart van Noord-Europa?",
                 a: "Slecht",
                 b: "Gemiddeld",
                 c: "Goed",
-                answer: "Goed"
+                answer: "Goed",
+                picture: "north_europe.png"
             }
         ];
-        this.numberRandom = this.canvas.randomNumber(0, this.questions.length - 1);
-    }
-    getGameState() {
-        return this.gameState;
+        window.setInterval(this.createScreen, 1000 / 60);
     }
 }
 class StartView extends ViewBase {

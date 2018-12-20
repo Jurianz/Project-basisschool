@@ -92,4 +92,10 @@ class KeyBoardListener{
     public getThreePressed(): boolean{
         return this.threePressed;
     }
+
+    public resetAnswer(): void {
+        this.onePressed = false;
+        this.twoPressed = false;
+        this.threePressed = false;
+    }
 }

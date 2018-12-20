@@ -57,7 +57,7 @@ class Canvas{
         element.src = src;
         element.style.zIndex = "-1";
 
-        element.addEventListener("load",()=>{
+        element.addEventListener("load", () => {
             this.ctx.drawImage(element,xCoordinate,yCoordinate);
         });
     }

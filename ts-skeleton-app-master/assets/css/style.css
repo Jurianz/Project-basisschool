@@ -13,8 +13,8 @@ canvas {
 body {
     overflow: hidden;
 }
-@font-face {
 
+@font-face {
     font-family:'Mars';
     src: url('../images/fonts/Mars.ttf');
 }

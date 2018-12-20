@@ -12,8 +12,8 @@ class Ball extends Entity {
         yPos: number,
         width: number,
         height: number,
-        dPos: number = -6,
-        wPos: number = 6
+        dPos: number = -4,
+        wPos: number = 4
     ) {
         super(canvas, imgSource, xPos, yPos, width, height);
         this.dPos = dPos;
@@ -47,7 +47,7 @@ class Ball extends Entity {
     }
 
     public collidedWithPlayer() {
-        this.wPos = 6;
+        this.wPos = 4;
     }
 
     public removeLife() {

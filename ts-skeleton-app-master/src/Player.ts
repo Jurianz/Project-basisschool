@@ -29,7 +29,7 @@ class Player extends Entity {
             this.xPos += 6;
         }
         if (this.xPos < 0) {
-            this.xPos = 0
+            this.xPos = 0;
         }
         if (this.getX() + (this.getWidth()) > window.innerWidth) {
             this.xPos = window.innerWidth - (this.getWidth())
