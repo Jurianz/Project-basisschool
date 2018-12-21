@@ -12,11 +12,11 @@ class Ball extends Entity {
         yPos: number,
         width: number,
         height: number,
-        dPos: number = -5,
+        dPos: number = 5,
         wPos: number = 5
     ) {
         super(canvas, imgSource, xPos, yPos, width, height);
-        this.dPos = dPos;
+        this.dPos = this.canvas.randomNumber(-dPos, dPos);
         this.wPos = wPos;
     }
 
@@ -26,7 +26,7 @@ class Ball extends Entity {
         if (this.getX() < 0) {
             this.dPos = -this.dPos;
         }
-        if (this.getX() + (this.getWidth() - 10) > window.innerWidth) {
+        if (this.getX() + (this.getWidth()) > window.innerWidth) {
             this.dPos = -this.dPos;
         }
         if (this.getY() < 0) {

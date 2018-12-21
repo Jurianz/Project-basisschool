@@ -78,9 +78,9 @@ class Player extends Entity {
     }
 
     public removeLife() {
-        this.lives -= 1
+        this.lives --;
         if (this.lives == 0) {
-            alert('Game over')
+            alert('Game over! Je bent al je levens kwijtgeraakt')
             location.reload();
         }
     }

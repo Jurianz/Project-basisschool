@@ -1,12 +1,12 @@
-class KeyBoardListener{
+class KeyBoardListener {
 
     private leftPressed: boolean;
     private rightPressed: boolean;
     private onePressed: boolean;
     private twoPressed: boolean;
     private threePressed: boolean;
-    
-    public constructor(){
+
+    public constructor() {
         this.leftPressed = false;
         this.rightPressed = false;
         this.onePressed = false;
@@ -26,13 +26,13 @@ class KeyBoardListener{
         if (event.keyCode == 39) {
             this.rightPressed = true;
         }
-        if (event.keyCode == 49) {
+        if (event.keyCode == 49 || event.keyCode == 97) {
             this.onePressed = true;
         }
-        if (event.keyCode == 50) {
+        if (event.keyCode == 50 || event.keyCode == 98) {
             this.twoPressed = true;
         }
-        if (event.keyCode == 51) {
+        if (event.keyCode == 51 || event.keyCode == 99) {
             this.threePressed = true;
         }
     }
@@ -42,18 +42,18 @@ class KeyBoardListener{
     */
     private keyUpHandler = (event: KeyboardEvent) => {
         if (event.keyCode == 37) {
-            this.leftPressed = false; 
+            this.leftPressed = false;
         }
         if (event.keyCode == 39) {
             this.rightPressed = false;
         }
-        if (event.keyCode == 49) {
+        if (event.keyCode == 49 || event.keyCode == 97) {
             this.onePressed = false;
         }
-        if (event.keyCode == 50) {
+        if (event.keyCode == 50 || event.keyCode == 98) {
             this.twoPressed = false;
         }
-        if (event.keyCode == 51) {
+        if (event.keyCode == 51 || event.keyCode == 99) {
             this.threePressed = false;
         }
     }
@@ -61,35 +61,35 @@ class KeyBoardListener{
     /**
      * Function to get the leftPressed property
      */
-    public getLeftPressed(): boolean{
+    public getLeftPressed(): boolean {
         return this.leftPressed;
     }
 
     /**
      * Function to get the rightPressed property
      */
-    public getRightPressed(): boolean{
+    public getRightPressed(): boolean {
         return this.rightPressed;
     }
 
     /**
      * Function to get the onePressed property
      */
-    public getOnePressed(): boolean{
+    public getOnePressed(): boolean {
         return this.onePressed;
     }
 
     /**
      * Function to get the twoPressed property
      */
-    public getTwoPressed(): boolean{
+    public getTwoPressed(): boolean {
         return this.twoPressed;
     }
 
     /**
      * Function to get the threePressed property
      */
-    public getThreePressed(): boolean{
+    public getThreePressed(): boolean {
         return this.threePressed;
     }
 

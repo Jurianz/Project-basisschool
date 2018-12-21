@@ -24,9 +24,9 @@ class Entity {
     }
 }
 class Ball extends Entity {
-    constructor(canvas, imgSource, xPos, yPos, width, height, dPos = -5, wPos = 5) {
+    constructor(canvas, imgSource, xPos, yPos, width, height, dPos = 5, wPos = 5) {
         super(canvas, imgSource, xPos, yPos, width, height);
-        this.dPos = dPos;
+        this.dPos = this.canvas.randomNumber(-dPos, dPos);
         this.wPos = wPos;
     }
     move() {
@@ -35,7 +35,7 @@ class Ball extends Entity {
         if (this.getX() < 0) {
             this.dPos = -this.dPos;
         }
-        if (this.getX() + (this.getWidth() - 10) > window.innerWidth) {
+        if (this.getX() + (this.getWidth()) > window.innerWidth) {
             this.dPos = -this.dPos;
         }
         if (this.getY() < 0) {
@@ -88,6 +88,7 @@ class Canvas {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.ctx = this.canvas.getContext('2d');
+        this.clicks = 0;
     }
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -112,19 +113,23 @@ class Canvas {
     getCenter() {
         return { X: this.canvas.width / 2, Y: this.canvas.height / 2 };
     }
-    writeButtonToCanvas(src) {
+    writeButtonToCanvas(src, imageWidth, imageHeight, imageYpos, numberofClicksBefore) {
         const horizontalCenter = this.canvas.width / 2;
         const verticalCenter = this.canvas.height / 2;
         let buttonElement = document.createElement("img");
         buttonElement.src = src;
         buttonElement.addEventListener("load", () => {
-            this.ctx.drawImage(buttonElement, horizontalCenter - 272, verticalCenter - 200);
+            this.ctx.drawImage(buttonElement, horizontalCenter - imageWidth, verticalCenter - imageYpos);
+            this.clicks = numberofClicksBefore;
         });
         this.canvas.addEventListener("click", (event) => {
-            if (event.x > horizontalCenter - 150 && event.x < horizontalCenter + 150) {
-                if (event.y > verticalCenter - 180 && event.y < verticalCenter - 124) {
-                    this.clearCanvas();
-                    this.startCountdown(3);
+            if (event.x > horizontalCenter - imageWidth && event.x < horizontalCenter + imageWidth) {
+                if (event.y > verticalCenter - imageYpos && event.y < verticalCenter - imageYpos + imageHeight) {
+                    if (this.clicks === 0) {
+                        this.clearCanvas();
+                        this.startCountdown(3);
+                        this.clicks++;
+                    }
                 }
             }
         });
@@ -179,13 +184,13 @@ class KeyBoardListener {
             if (event.keyCode == 39) {
                 this.rightPressed = true;
             }
-            if (event.keyCode == 49) {
+            if (event.keyCode == 49 || event.keyCode == 97) {
                 this.onePressed = true;
             }
-            if (event.keyCode == 50) {
+            if (event.keyCode == 50 || event.keyCode == 98) {
                 this.twoPressed = true;
             }
-            if (event.keyCode == 51) {
+            if (event.keyCode == 51 || event.keyCode == 99) {
                 this.threePressed = true;
             }
         };
@@ -196,13 +201,13 @@ class KeyBoardListener {
             if (event.keyCode == 39) {
                 this.rightPressed = false;
             }
-            if (event.keyCode == 49) {
+            if (event.keyCode == 49 || event.keyCode == 97) {
                 this.onePressed = false;
             }
-            if (event.keyCode == 50) {
+            if (event.keyCode == 50 || event.keyCode == 98) {
                 this.twoPressed = false;
             }
-            if (event.keyCode == 51) {
+            if (event.keyCode == 51 || event.keyCode == 99) {
                 this.threePressed = false;
             }
         };
@@ -286,9 +291,9 @@ class Player extends Entity {
         return this.lives;
     }
     removeLife() {
-        this.lives -= 1;
+        this.lives--;
         if (this.lives == 0) {
-            alert('Game over');
+            alert('Game over! Je bent al je levens kwijtgeraakt');
             location.reload();
         }
     }
@@ -301,30 +306,15 @@ class ViewBase {
         this.createScreen();
     }
 }
-class ContinentView extends ViewBase {
-    constructor() {
-        super();
-        const canvasElement = document.getElementById('canvas');
-        this.canvas = new Canvas(canvasElement);
-        this.createScreen();
-    }
-    createScreen() {
-        document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
-        document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-1";
-        this.canvas.writeImageToCanvas("./assets/images/continents/europe.png", this.canvas.getCenter().X - 151, this.canvas.getCenter().Y - 116);
-    }
-}
 class DifficultyView extends ViewBase {
     constructor() {
         super();
+        this.createScreen = () => {
+            document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
+            document.body.style.backgroundSize = "cover";
+        };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
-    }
-    createScreen() {
-        document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
-        document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-1";
     }
 }
 class LevelView extends ViewBase {
@@ -403,18 +393,17 @@ class LevelView extends ViewBase {
         this.compareAnswers = () => {
             if (this.difficultQuestions[this.numberRandom].answer === this.questionAnswer) {
                 alert('Goed gedaan! Je antwoord was goed (LET OP: Het spel gaat meteen verder!)');
-                this.difficultQuestions.splice(this.numberRandom, 1);
             }
             else {
-                alert(`Helaas! Het goede antwoord was ${this.difficultQuestions[this.numberRandom].answer} (LET OP: Het spel gaat meteen verder!)`);
-                this.difficultQuestions.splice(this.numberRandom, 1);
+                alert(`Helaas! Je ben een leven verloren. Het goede antwoord was ${this.difficultQuestions[this.numberRandom].answer} (LET OP: Het spel gaat meteen verder!)`);
+                this.player.removeLife();
             }
+            this.difficultQuestions.splice(this.numberRandom, 1);
             this.gameState = "PLAY";
             this.canvas.clearCanvas();
             this.keyBoardListener.resetAnswer();
             document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
             document.body.style.backgroundSize = "cover";
-            document.body.style.zIndex = "-1";
         };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
@@ -423,7 +412,6 @@ class LevelView extends ViewBase {
         this.gameState = "PLAY";
         document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-1";
         this.canvas = new Canvas(canvasElement);
         this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", this.canvas.getCenter().X - 100, this.canvas.getHeight() - 30, 200, 25);
         this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", this.canvas.getCenter().X, 500, 35, 35);
@@ -644,15 +632,15 @@ class LevelView extends ViewBase {
 class StartView extends ViewBase {
     constructor() {
         super();
+        this.createScreen = () => {
+            this.canvas.writeTextToCanvas('World Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
+            this.canvas.writeButtonToCanvas('./assets/images/startscreenButton.png', 147, 58, 180, 0);
+        };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
         document.body.style.background = "url('./assets/images/backgrounds/startBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-2";
-    }
-    createScreen() {
-        this.canvas.writeTextToCanvas('World Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
-        this.canvas.writeButtonToCanvas('./assets/images/startscreenButton.png');
+        document.body.style.zIndex = "-1";
     }
 }
 //# sourceMappingURL=app.js.map

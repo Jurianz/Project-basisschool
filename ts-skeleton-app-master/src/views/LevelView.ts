@@ -1,4 +1,5 @@
-///<reference path="Viewbase.ts"/>
+/// <reference path = "Viewbase.ts"/>
+
 class LevelView extends ViewBase {
 
     private easyQuestions: Array<any>;
@@ -29,7 +30,6 @@ class LevelView extends ViewBase {
         this.gameState = "PLAY";
         document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-1";
         this.canvas = new Canvas(canvasElement);
         this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", this.canvas.getCenter().X - 100, this.canvas.getHeight() - 30, 200, 25);
         this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", this.canvas.getCenter().X, 500, 35, 35);
@@ -319,16 +319,15 @@ class LevelView extends ViewBase {
     compareAnswers = () => {
         if (this.difficultQuestions[this.numberRandom].answer === this.questionAnswer) {
             alert('Goed gedaan! Je antwoord was goed (LET OP: Het spel gaat meteen verder!)')
-            this.difficultQuestions.splice(this.numberRandom, 1);
         } else {
-            alert(`Helaas! Het goede antwoord was ${this.difficultQuestions[this.numberRandom].answer} (LET OP: Het spel gaat meteen verder!)`);
-            this.difficultQuestions.splice(this.numberRandom, 1);
+            alert(`Helaas! Je ben een leven verloren. Het goede antwoord was ${this.difficultQuestions[this.numberRandom].answer} (LET OP: Het spel gaat meteen verder!)`);
+            this.player.removeLife();
         }
+        this.difficultQuestions.splice(this.numberRandom, 1);
         this.gameState = "PLAY";
         this.canvas.clearCanvas();
         this.keyBoardListener.resetAnswer();
         document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
-        document.body.style.zIndex = "-1";
     }
 }
