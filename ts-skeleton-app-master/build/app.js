@@ -89,6 +89,9 @@ class Canvas {
         this.canvas.height = window.innerHeight;
         this.ctx = this.canvas.getContext('2d');
         this.clicks = 0;
+        this.easyClicks = 0;
+        this.topoClicks = 0;
+        this.difficultClicks = 0;
     }
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -113,21 +116,21 @@ class Canvas {
     getCenter() {
         return { X: this.canvas.width / 2, Y: this.canvas.height / 2 };
     }
-    writeButtonToCanvas(src, imageWidth, imageHeight, imageYpos, numberofClicksBefore) {
+    writeStartButtonToCanvas(src, imageWidth, imageHeight, imageYpos) {
         const horizontalCenter = this.canvas.width / 2;
         const verticalCenter = this.canvas.height / 2;
         let buttonElement = document.createElement("img");
         buttonElement.src = src;
         buttonElement.addEventListener("load", () => {
-            this.ctx.drawImage(buttonElement, horizontalCenter - imageWidth, verticalCenter - imageYpos);
-            this.clicks = numberofClicksBefore;
+            this.ctx.drawImage(buttonElement, horizontalCenter - (imageWidth / 2), verticalCenter - imageYpos);
         });
         this.canvas.addEventListener("click", (event) => {
-            if (event.x > horizontalCenter - imageWidth && event.x < horizontalCenter + imageWidth) {
+            if (event.x > horizontalCenter - (imageWidth / 2) && event.x < horizontalCenter + (imageWidth / 2)) {
                 if (event.y > verticalCenter - imageYpos && event.y < verticalCenter - imageYpos + imageHeight) {
-                    if (this.clicks === 0) {
+                    if (this.clicks == 0) {
                         this.clearCanvas();
-                        this.startCountdown(3);
+                        const difficultView = new DifficultyView();
+                        difficultView.createScreen();
                         this.clicks++;
                     }
                 }
@@ -135,17 +138,124 @@ class Canvas {
         });
     }
     ;
-    startCountdown(seconds) {
+    writeEasyDifficultyButtonToCanvas(src, imageWidth, imageHeight, imageYpos) {
+        const horizontalCenter = this.canvas.width / 2;
+        const verticalCenter = this.canvas.height / 2;
+        let buttonElement = document.createElement("img");
+        buttonElement.src = src;
+        buttonElement.addEventListener("load", () => {
+            this.ctx.drawImage(buttonElement, horizontalCenter - (imageWidth / 2), verticalCenter - imageYpos);
+        });
+        this.canvas.addEventListener("click", (event) => {
+            if (event.x > horizontalCenter - (imageWidth / 2) && event.x < horizontalCenter + (imageWidth / 2)) {
+                if (event.y > verticalCenter - imageYpos && event.y < verticalCenter - imageYpos + imageHeight) {
+                    if (this.easyClicks == 0) {
+                        this.clearCanvas();
+                        this.easyClicks++;
+                        this.startEasyCountdown(3);
+                    }
+                    ;
+                }
+                ;
+            }
+            ;
+        });
+    }
+    ;
+    writeTopoDifficultyButtonToCanvas(src, imageWidth, imageHeight, imageYpos) {
+        const horizontalCenter = this.canvas.width / 2;
+        const verticalCenter = this.canvas.height / 2;
+        let buttonElement = document.createElement("img");
+        buttonElement.src = src;
+        buttonElement.addEventListener("load", () => {
+            this.ctx.drawImage(buttonElement, horizontalCenter - (imageWidth / 2), verticalCenter - imageYpos);
+        });
+        this.canvas.addEventListener("click", (event) => {
+            if (event.x > horizontalCenter - (imageWidth / 2) && event.x < horizontalCenter + (imageWidth / 2)) {
+                if (event.y > verticalCenter - imageYpos && event.y < verticalCenter - imageYpos + imageHeight) {
+                    if (this.topoClicks == 0) {
+                        this.clearCanvas();
+                        this.topoClicks++;
+                        this.startTopoCountdown(3);
+                    }
+                    ;
+                }
+                ;
+            }
+            ;
+        });
+    }
+    ;
+    writeDifficultDifficultyButtonToCanvas(src, imageWidth, imageHeight, imageYpos) {
+        const horizontalCenter = this.canvas.width / 2;
+        const verticalCenter = this.canvas.height / 2;
+        let buttonElement = document.createElement("img");
+        buttonElement.src = src;
+        buttonElement.addEventListener("load", () => {
+            this.ctx.drawImage(buttonElement, horizontalCenter - (imageWidth / 2), verticalCenter - imageYpos);
+        });
+        this.canvas.addEventListener("click", (event) => {
+            if (event.x > horizontalCenter - (imageWidth / 2) && event.x < horizontalCenter + (imageWidth / 2)) {
+                if (event.y > verticalCenter - imageYpos && event.y < verticalCenter - imageYpos + imageHeight) {
+                    if (this.difficultClicks == 0) {
+                        this.clearCanvas();
+                        this.difficultClicks++;
+                        this.startDifficultCountdown(3);
+                    }
+                    ;
+                }
+                ;
+            }
+            ;
+        });
+    }
+    ;
+    startEasyCountdown(seconds) {
         var counter = seconds;
-        this.writeTextToCanvas('World Explorer', 100, this.getCenter().X, 100, "white", "center");
+        this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
         var interval = setInterval(() => {
             this.clearCanvas();
-            this.writeTextToCanvas('World Explorer', 100, this.getCenter().X, 100, "white", "center");
-            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y - 75, "white");
+            this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
+            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y + 75, "white");
             counter--;
             if (counter < 0) {
                 clearInterval(interval);
                 const levelView = new LevelView();
+                levelView.setEasyQuestions();
+            }
+            ;
+        }, 1000);
+    }
+    ;
+    startTopoCountdown(seconds) {
+        var counter = seconds;
+        this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
+        var interval = setInterval(() => {
+            this.clearCanvas();
+            this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
+            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y + 75, "white");
+            counter--;
+            if (counter < 0) {
+                clearInterval(interval);
+                const levelView = new LevelView();
+                levelView.setTopoQuestions();
+            }
+            ;
+        }, 1000);
+    }
+    ;
+    startDifficultCountdown(seconds) {
+        var counter = seconds;
+        this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
+        var interval = setInterval(() => {
+            this.clearCanvas();
+            this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
+            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y + 75, "white");
+            counter--;
+            if (counter < 0) {
+                clearInterval(interval);
+                const levelView = new LevelView();
+                levelView.setDifficultQuestions();
             }
             ;
         }, 1000);
@@ -310,22 +420,25 @@ class DifficultyView extends ViewBase {
     constructor() {
         super();
         this.createScreen = () => {
-            document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
-            document.body.style.backgroundSize = "cover";
+            this.canvas.writeTextToCanvas('Europe Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
+            this.canvas.writeTextToCanvas('Kies een niveau:', 40, this.canvas.getCenter().X, 165, "white", "center");
+            this.canvas.writeEasyDifficultyButtonToCanvas("./assets/images/makkelijk.png", 302, 70, this.canvas.getCenter().Y - 200);
+            this.canvas.writeTopoDifficultyButtonToCanvas("./assets/images/topografie.png", 348, 73, this.canvas.getCenter().Y - 350);
+            this.canvas.writeDifficultDifficultyButtonToCanvas("./assets/images/moeilijk.png", 253, 71, this.canvas.getCenter().Y - 500);
         };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
+        document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
     }
 }
 class LevelView extends ViewBase {
     constructor() {
         super();
-        this.imageArray = ["./assets/images/blocks/blueBlock.png",
+        this.imageArray = [
             "./assets/images/blocks/redBlock.png",
             "./assets/images/blocks/greenBlock.png",
-            "./assets/images/blocks/greyBlock.png",
             "./assets/images/blocks/orangeBlock.png",
-            "./assets/images/blocks/purpleBlock.png",
             "./assets/images/blocks/yellowBlock.png"
         ];
         this.createScreen = () => {
@@ -354,34 +467,34 @@ class LevelView extends ViewBase {
                             alert('Goed gedaan!');
                             location.reload();
                         }
-                        if (this.blockArray.length == 12 || this.blockArray.length == 9 || this.blockArray.length == 6 || this.blockArray.length == 3) {
+                        if (this.blockArray.length == 28 || this.blockArray.length == 24 || this.blockArray.length == 20 || this.blockArray.length == 16 || this.blockArray.length == 12 || this.blockArray.length == 8 || this.blockArray.length == 4) {
                             this.questionAnswer = null;
-                            this.numberRandom = this.canvas.randomNumber(0, this.difficultQuestions.length - 1);
+                            this.numberRandom = this.canvas.randomNumber(0, this.questions.length - 1);
                             this.gameState = "QUESTION";
                             document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
                             document.body.style.backgroundSize = "cover";
-                            document.body.style.zIndex = "-1";
                         }
                     }
                 }
             }
             if (this.gameState === "QUESTION") {
                 this.canvas.clearCanvas();
-                this.canvas.writeImageToCanvas(`./assets/images/question/${this.difficultQuestions[this.numberRandom].picture}`, 25, 210);
-                this.canvas.writeTextToCanvas(this.difficultQuestions[this.numberRandom].question, 30, this.canvas.getCenter().X, 50, "white");
-                this.canvas.writeTextToCanvas(` 1: ${this.difficultQuestions[this.numberRandom].a}`, 50, this.canvas.getCenter().X - 25, 295, "white", "left");
-                this.canvas.writeTextToCanvas(`2: ${this.difficultQuestions[this.numberRandom].b}`, 50, this.canvas.getCenter().X - 25, 395, "white", "left");
-                this.canvas.writeTextToCanvas(`3: ${this.difficultQuestions[this.numberRandom].c}`, 50, this.canvas.getCenter().X - 25, 495, "white", "left");
+                this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 25, 200);
+                this.canvas.writeTextToCanvas("Druk het juiste cijfer in op je toetsenbord, om antwoord te geven op de vraag", 20, this.canvas.getCenter().X, 50, "white");
+                this.canvas.writeTextToCanvas(`${this.questions[this.numberRandom].question}`, 30, this.canvas.getCenter().X, 125, "white");
+                this.canvas.writeTextToCanvas(` 1: ${this.questions[this.numberRandom].a}`, 50, this.canvas.getCenter().X - 25, 295, "white", "left");
+                this.canvas.writeTextToCanvas(`2: ${this.questions[this.numberRandom].b}`, 50, this.canvas.getCenter().X - 25, 395, "white", "left");
+                this.canvas.writeTextToCanvas(`3: ${this.questions[this.numberRandom].c}`, 50, this.canvas.getCenter().X - 25, 495, "white", "left");
                 if (this.keyBoardListener.getOnePressed()) {
-                    this.questionAnswer = this.difficultQuestions[this.numberRandom].a;
+                    this.questionAnswer = this.questions[this.numberRandom].a;
                     this.compareAnswers();
                 }
                 if (this.keyBoardListener.getTwoPressed()) {
-                    this.questionAnswer = this.difficultQuestions[this.numberRandom].b;
+                    this.questionAnswer = this.questions[this.numberRandom].b;
                     this.compareAnswers();
                 }
                 if (this.keyBoardListener.getThreePressed()) {
-                    this.questionAnswer = this.difficultQuestions[this.numberRandom].c;
+                    this.questionAnswer = this.questions[this.numberRandom].c;
                     this.compareAnswers();
                 }
             }
@@ -391,19 +504,15 @@ class LevelView extends ViewBase {
             }
         };
         this.compareAnswers = () => {
-            if (this.difficultQuestions[this.numberRandom].answer === this.questionAnswer) {
-                alert('Goed gedaan! Je antwoord was goed (LET OP: Het spel gaat meteen verder!)');
+            if (this.questions[this.numberRandom].answer === this.questionAnswer) {
+                this.gameState = "COUNTDOWN";
+                this.startRightCountdown(5);
             }
             else {
-                alert(`Helaas! Je ben een leven verloren. Het goede antwoord was ${this.difficultQuestions[this.numberRandom].answer} (LET OP: Het spel gaat meteen verder!)`);
+                this.gameState = "COUNTDOWN";
                 this.player.removeLife();
+                this.startWrongCountdown(5);
             }
-            this.difficultQuestions.splice(this.numberRandom, 1);
-            this.gameState = "PLAY";
-            this.canvas.clearCanvas();
-            this.keyBoardListener.resetAnswer();
-            document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
-            document.body.style.backgroundSize = "cover";
         };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);
@@ -415,31 +524,62 @@ class LevelView extends ViewBase {
         this.canvas = new Canvas(canvasElement);
         this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", this.canvas.getCenter().X - 100, this.canvas.getHeight() - 30, 200, 25);
         this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", this.canvas.getCenter().X, 500, 35, 35);
-        this.blockArray = [new Block(canvasElement, this.imageArray[1], 10, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 200, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 390, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 580, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 770, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 960, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 1150, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 1340, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 10, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 200, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 390, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 580, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 770, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 960, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 1150, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[1], 1340, 100, 184, 61)];
-        this.easyQuestions = [
+        this.makeBlockArray();
+        window.setInterval(this.createScreen, 1000 / 60);
+    }
+    startRightCountdown(seconds) {
+        var counter = seconds;
+        this.canvas.clearCanvas();
+        this.canvas.writeTextToCanvas(`${this.questions[this.numberRandom].question}`, 30, this.canvas.getCenter().X, 125, "white");
+        var interval = setInterval(() => {
+            this.canvas.clearCanvas();
+            this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 25, 200);
+            this.canvas.writeTextToCanvas(`Je antwoord ${this.questionAnswer} is goed`, 30, this.canvas.getCenter().X, 125, "white");
+            this.canvas.writeTextToCanvas(`${counter}`, 150, this.canvas.getCenter().X + 235, this.canvas.getCenter().Y + 350, "white");
+            this.canvas.writeImageToCanvas("./assets/images/goedgedaan.png", this.canvas.getCenter().X + 100, this.canvas.getCenter().Y - 150);
+            counter--;
+            if (counter < 0) {
+                clearInterval(interval);
+                this.questions.splice(this.numberRandom, 1);
+                this.gameState = "PLAY";
+                this.canvas.clearCanvas();
+                this.keyBoardListener.resetAnswer();
+                document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+                document.body.style.backgroundSize = "cover";
+            }
+            ;
+        }, 1000);
+    }
+    ;
+    startWrongCountdown(seconds) {
+        var counter = seconds;
+        this.canvas.clearCanvas();
+        this.canvas.writeTextToCanvas(`${this.questions[this.numberRandom].question}`, 30, this.canvas.getCenter().X, 125, "white");
+        var interval = setInterval(() => {
+            this.canvas.clearCanvas();
+            this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 25, 200);
+            this.canvas.writeTextToCanvas(`Je antwoord ${this.questionAnswer} is fout`, 30, this.canvas.getCenter().X, 75, "white");
+            this.canvas.writeTextToCanvas(`${counter}`, 150, this.canvas.getCenter().X + 250, this.canvas.getCenter().Y + 350, "white");
+            this.canvas.writeTextToCanvas("Het goede antwoord was: ", 30, this.canvas.getCenter().X, 150, "white");
+            this.canvas.writeTextToCanvas(`${this.questions[this.numberRandom].answer}`, 30, this.canvas.getCenter().X + 225, 150, "lightgreen", "left");
+            this.canvas.writeImageToCanvas("./assets/images/helaas.png", this.canvas.getCenter().X + 100, this.canvas.getCenter().Y - 150);
+            counter--;
+            if (counter < 0) {
+                clearInterval(interval);
+                this.questions.splice(this.numberRandom, 1);
+                this.gameState = "PLAY";
+                this.canvas.clearCanvas();
+                this.keyBoardListener.resetAnswer();
+                document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+                document.body.style.backgroundSize = "cover";
+            }
+            ;
+        }, 1000);
+    }
+    ;
+    setEasyQuestions() {
+        this.questions = [
             {
-                question: "Welke van de volgende steden ligt in Engeland?",
-                a: "München",
-                b: "Liverpool",
-                c: "Monaco",
-                answer: "Liverpool",
-                picture: "england.png"
-            }, {
                 question: "Welke rivier begint in Frankrijk en loopt door naar Belgie en Nederland?",
                 a: "Rijn",
                 b: "Seine",
@@ -525,7 +665,449 @@ class LevelView extends ViewBase {
                 picture: "fjord.png"
             }
         ];
-        this.difficultQuestions = [
+    }
+    ;
+    setTopoQuestions() {
+        this.questions = [{
+                question: "Waar ligt Schotland in Verenigd koninkrijk?",
+                a: "In het noorden",
+                b: "in het midden",
+                c: "in het zuiden",
+                answer: "In het noorden",
+                picture: "schotland.png"
+            }, {
+                question: "Welke van de volgende steden ligt in Verenigd Koninkrijk?",
+                a: "München",
+                b: "Liverpool",
+                c: "Monaco",
+                answer: "Liverpool",
+                picture: "england.png"
+            }, {
+                question: "Wat is de naam van het land op letter A?",
+                a: "België",
+                b: "Luxemburg",
+                c: "Nederland",
+                answer: "Nederland",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter  B?",
+                a: "Duitsland",
+                b: "België",
+                c: "Verenigd Koninkrijk",
+                answer: "Verenigd Koninkrijk",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter  C?",
+                a: "Duitsland",
+                b: "België",
+                c: "Ierland",
+                answer: "België",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter  D?",
+                a: "Oost- Verenigd Koninkrijk",
+                b: "Ierland",
+                c: "Noord-Ierland",
+                answer: "Ierland",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter  E?",
+                a: "Ierland",
+                b: "België",
+                c: "Luxemburg",
+                answer: "Luxemburg",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter  F?",
+                a: "Frankrijk",
+                b: "Duitsland",
+                c: "Nederland",
+                answer: "Frankrijk",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter  G?",
+                a: "Frankrijk",
+                b: "Duitsland",
+                c: "Ierland",
+                answer: "Duitsland",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 1?",
+                a: "Antwerpen",
+                b: "Liverpool",
+                c: "Bordeaux",
+                answer: "Antwerpen",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 2?",
+                a: "Lyon",
+                b: "Parijs",
+                c: "Londen",
+                answer: "Lyon",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 3?",
+                a: "Berlijn",
+                b: "Munchen",
+                c: "Keulen",
+                answer: "Keulen",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 4?",
+                a: "Berlijn",
+                b: "Dublin",
+                c: "Hamburg",
+                answer: "Berlijn",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 5?",
+                a: "Amsterdam",
+                b: "Keulen",
+                c: "Luxemburg",
+                answer: "Luxemburg",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 6?",
+                a: "Dublin",
+                b: "Glasgow",
+                c: "Bordeaux",
+                answer: "Dublin",
+                picture: "westEuropa.png"
+            }, {
+                question: "WWat is de naam van de stad op plaats 7?",
+                a: "Glasgow",
+                b: "Marseille",
+                c: "Berlijn",
+                answer: "Marseille",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 8?",
+                a: "Hamburg",
+                b: "Brussel",
+                c: "Amsterdam",
+                answer: "Amsterdam",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 9?",
+                a: "Keulen",
+                b: "Brussel",
+                c: "München",
+                answer: "Keulen",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 10?",
+                a: "Marseille",
+                b: "Luxemburg",
+                c: "Brussel",
+                answer: "Brussel",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 11?",
+                a: "Londen",
+                b: "Liverpool",
+                c: "Brussel",
+                answer: "Londen",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 12?",
+                a: "Hamburg",
+                b: "Parijs",
+                c: "Liverpool",
+                answer: "Liverpool",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 13?",
+                a: "Glasgow",
+                b: "Londen",
+                c: "Manchester",
+                answer: "Glasgow",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 14?",
+                a: "Bordeaux",
+                b: "Parijs",
+                c: "Glasgow",
+                answer: "Parijs",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 15?",
+                a: "Bordeaux",
+                b: "Londen",
+                c: "Marseille",
+                answer: "Bordeaux",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 16?",
+                a: "Hamburg",
+                b: "Hamburger",
+                c: "Kaassouffle",
+                answer: "Hamburg",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de rivier op plaats a?",
+                a: "Het kanaal",
+                b: "Seine",
+                c: "Donau",
+                answer: "Het kanaal",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de oceaan/zee op plaats b?",
+                a: "Middellandse Oceaan",
+                b: "Atlantische Oceaan",
+                c: "Middellandse Zee",
+                answer: "Atlantische Oceaan",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de rivier op plaats c?",
+                a: "Seine",
+                b: "Schelde",
+                c: "Rijn",
+                answer: "Seine",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de rivier op plaats d?",
+                a: "Seine",
+                b: "Rhône",
+                c: "Theems",
+                answer: "Theems",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de oceaan/zee op plaats e?",
+                a: "Noordzee",
+                b: "Oostzee",
+                c: "Middellandse Oceaan",
+                answer: "Noordzee",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de rivier op plaats f?",
+                a: "Schelde",
+                b: "Donau",
+                c: "Rijn",
+                answer: "Donau",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de rivier op plaats g?",
+                a: "Rhône",
+                b: "Donau",
+                c: "Schelde",
+                answer: "Schelde",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de oceaan/zee op plaats h?",
+                a: "Middellandse Zee",
+                b: "Atlantische Oceaan",
+                c: "Noordzee",
+                answer: "Middellandse Zee",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de rivier op plaats i?",
+                a: "Schelde",
+                b: "Donau",
+                c: "Rijn",
+                answer: "Rijn",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de rivier op plaats j?",
+                a: "Donau",
+                b: "Rhône",
+                c: "Seine",
+                answer: "Rhône",
+                picture: "westEuropa.png"
+            }, {
+                question: "Wat is de naam van de oceaan/zee op plaats a?",
+                a: "Noordzee",
+                b: "Oostzee",
+                c: "Atlatische Oceaan",
+                answer: "Atlantische Oceaan",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van de oceaan/zee op plaats b?",
+                a: "Noordelijke IJszee",
+                b: "Noordzee",
+                c: "Oostzee",
+                answer: "Noordzee",
+                picture: " kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van de oceaan/zee op plaats c?",
+                a: "Oostzee",
+                b: "Atlatische Oceaan",
+                c: "Noordzee",
+                answer: "Oostzee",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van de oceaan/zee op plaats d?",
+                a: "Noordelijke IJszee",
+                b: "Oostzee",
+                c: "Atlatische Oceaan",
+                answer: "Noordelijke IJszee",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter A?",
+                a: "Zweden",
+                b: "IJsland",
+                c: "Noorwegen",
+                answer: "IJsland",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter B?",
+                a: "Noorwegen",
+                b: "Denemarken",
+                c: "Zweden",
+                answer: "Zweden",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter C?",
+                a: "Finland",
+                b: "Noorwegen",
+                c: "Letland",
+                answer: "Noorwegen",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter D?",
+                a: "Estland",
+                b: "Letland",
+                c: "Litouwen",
+                answer: "Letland",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter E?",
+                a: "Litouwen",
+                b: "Estland",
+                c: "Letland",
+                answer: "Litouwen",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter F?",
+                a: "Letland",
+                b: "Litouwen",
+                c: "Estland",
+                answer: "Estland",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter G?",
+                a: "Litouwen",
+                b: "IJsland",
+                c: "Finland",
+                answer: "Finland",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van het land op letter H?",
+                a: "Noorwegen",
+                b: "Denemarken",
+                c: "Estland",
+                answer: "Estland",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 1?",
+                a: "Reykjavik",
+                b: "Stockholm",
+                c: "Helsinki",
+                answer: "Stockholm",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 2?",
+                a: "Reykjavik",
+                b: "Oslo",
+                c: "Kopenhagen",
+                answer: "Reykjavik",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 3?",
+                a: "Oslo",
+                b: "Helsinki",
+                c: "Stockholm",
+                answer: "Oslo",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 4?",
+                a: "Helsinki",
+                b: "Stockholm",
+                c: "Kopenhagen",
+                answer: "Kopenhagen",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Wat is de naam van de stad op plaats 5?",
+                a: "Reykjavik",
+                b: "Oslo",
+                c: "Helsinki",
+                answer: "Helsinki",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Welk gebied ligt op plaats i",
+                a: "Ruhrgebied",
+                b: "Scandinavië",
+                c: "Noordkaap",
+                answer: "Scandinavië",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Welk gebied ligt op plaats ii",
+                a: "Noordkaap",
+                b: "Balkanlanden",
+                c: "Scandinavië",
+                answer: "Noordkaap",
+                picture: "kaart-noordEuropa.png"
+            }, {
+                question: "Welke bestuurlijke eenheid ligt er op plaats I?",
+                a: "Wallonië",
+                b: "Vlaanderen",
+                c: "Schotland",
+                answer: "Vlaanderen",
+                picture: "westEuropa.png"
+            }, {
+                question: "Welke bestuurlijke eenheid ligt er op plaats II?",
+                a: "Schotland",
+                b: "Engeland",
+                c: "Vlaanderen",
+                answer: "Schotland",
+                picture: "westEuropa.png"
+            }, {
+                question: "Welke bestuurlijke eenheid ligt er op plaats III?",
+                a: "Wallonië",
+                b: "Engeland",
+                c: "Schotland",
+                answer: "Wallonië",
+                picture: "westEuropa.png"
+            }, {
+                question: "Welke bestuurlijke eenheid ligt er op plaats IV?",
+                a: "Schotland",
+                b: "Vlaanderen",
+                c: "Engeland",
+                answer: "Engeland",
+                picture: "westEuropa.png"
+            }, {
+                question: "Welke gebergte ligt er op plaats i?",
+                a: "Pyreneeën",
+                b: "Ruhrgebied",
+                c: "Alplen",
+                answer: "Ardennen",
+                picture: "westEuropa.png"
+            }, {
+                question: "Welke gebergte ligt er op plaats ii?",
+                a: "Alpen",
+                b: "Pyreneeën",
+                c: "Ruhrgebied",
+                answer: "Pyreneeën",
+                picture: "westEuropa.png"
+            }, {
+                question: "Welke gebergte ligt er op plaats iii?",
+                a: "Ruhrgebied",
+                b: "Alpen",
+                c: "Ardennen",
+                answer: "Ruhrgebied",
+                picture: "westEuropa.pn"
+            }, {
+                question: "Welke gebergte ligt er op plaats iv?",
+                a: "Ruhrgebied",
+                b: "Alpen",
+                c: "Pyreneeën",
+                answer: "Alpen",
+                picture: "westEuropa.png"
+            }
+        ];
+    }
+    ;
+    setDifficultQuestions() {
+        this.questions = [
             {
                 question: "Welk gebergte grenst aan Frankrijk en Spanje?",
                 a: "Pyreneeën",
@@ -565,16 +1147,9 @@ class LevelView extends ViewBase {
                 question: "Welke buurlanden heeft België naast Nederland en Duitsland?",
                 a: "Frankrijk",
                 b: "Frankrijk en Luxemburg",
-                c: "Frankrijk en Engeland",
+                c: "Frankrijk en Verenigd Koninkrijk",
                 answer: "Frankrijk en Luxemburg",
                 picture: "belgium.png"
-            }, {
-                question: "Waar ligt Schotland in Groot-Brittanië?",
-                a: "In het noorden",
-                b: "in het midden",
-                c: "in het zuiden",
-                answer: "In het noorden",
-                picture: "schotland.png"
             }, {
                 question: "Waar bestaat IJsland voor het grootste deel uit?",
                 a: "Woestijn",
@@ -626,15 +1201,51 @@ class LevelView extends ViewBase {
                 picture: "rotterdam.png"
             }
         ];
-        window.setInterval(this.createScreen, 1000 / 60);
+    }
+    ;
+    makeBlockArray() {
+        const canvasElement = document.getElementById('canvas');
+        this.blockArray = [new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 10, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 200, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 390, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 580, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 770, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 960, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1150, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1340, 30, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 10, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 200, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 390, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 580, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 770, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 960, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1150, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1340, 100, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 10, 170, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 200, 170, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 390, 170, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 580, 170, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 770, 170, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 960, 170, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1150, 170, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1340, 170, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 10, 240, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 200, 240, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 390, 240, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 580, 240, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 770, 240, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 960, 240, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1150, 240, 184, 61),
+            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1340, 240, 184, 61)];
     }
 }
+;
 class StartView extends ViewBase {
     constructor() {
         super();
         this.createScreen = () => {
-            this.canvas.writeTextToCanvas('World Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
-            this.canvas.writeButtonToCanvas('./assets/images/startscreenButton.png', 147, 58, 180, 0);
+            this.canvas.writeTextToCanvas('Europe Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
+            this.canvas.writeStartButtonToCanvas('./assets/images/startscreenButton.png', 294, 58, this.canvas.getCenter().Y - 200);
         };
         const canvasElement = document.getElementById('canvas');
         this.canvas = new Canvas(canvasElement);

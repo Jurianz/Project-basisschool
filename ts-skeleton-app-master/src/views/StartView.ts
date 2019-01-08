@@ -12,8 +12,7 @@ class StartView extends ViewBase {
     }
 
     createScreen = () => {
-        this.canvas.writeTextToCanvas('World Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
-        this.canvas.writeButtonToCanvas('./assets/images/startscreenButton.png', 147, 58, 180, 0);
+        this.canvas.writeTextToCanvas('Europe Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
+        this.canvas.writeStartButtonToCanvas('./assets/images/startscreenButton.png', 294, 58, this.canvas.getCenter().Y - 200);
     }
-
 }
