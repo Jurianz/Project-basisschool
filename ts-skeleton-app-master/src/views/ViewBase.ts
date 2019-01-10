@@ -3,12 +3,12 @@ abstract class ViewBase {
     protected canvas: Canvas;
 
     protected constructor() {
-    }
+        const canvasElement: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('canvas');
+        this.canvas = new Canvas(canvasElement);
+    };
 
-    public render(): void{
-        this.canvas.clearCanvas();
-        this.createScreen();
-    }
-
-    protected abstract createScreen(): void 
-}
+    /**
+     * The function createScreen who needs to be implemented by every child of this class
+     */
+    protected abstract createScreen(): void
+};

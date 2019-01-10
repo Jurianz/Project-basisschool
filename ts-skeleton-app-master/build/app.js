@@ -7,41 +7,55 @@ class Entity {
         this.width = width;
         this.height = height;
     }
+    ;
     draw() {
         this.canvas.writeImageToCanvas(this.imgSource, this.xPos, this.yPos);
     }
+    ;
     getX() {
         return this.xPos;
     }
+    ;
     getY() {
         return this.yPos;
     }
+    ;
     getWidth() {
         return this.width;
     }
+    ;
     getHeight() {
         return this.height;
     }
+    ;
 }
+;
 class Ball extends Entity {
     constructor(canvas, imgSource, xPos, yPos, width, height, dPos = 5, wPos = 5) {
         super(canvas, imgSource, xPos, yPos, width, height);
         this.dPos = this.canvas.randomNumber(-dPos, dPos);
         this.wPos = wPos;
     }
+    ;
     move() {
         this.xPos += this.dPos;
         this.yPos -= this.wPos;
         if (this.getX() < 0) {
             this.dPos = -this.dPos;
+            this.xPos = 1;
         }
-        if (this.getX() + (this.getWidth()) > window.innerWidth) {
+        ;
+        if (this.getX() + (this.getWidth()) > this.canvas.getWidth()) {
             this.dPos = -this.dPos;
+            this.xPos = this.canvas.getWidth() - this.getWidth() - 1;
         }
+        ;
         if (this.getY() < 0) {
             this.wPos = -this.wPos;
         }
+        ;
     }
+    ;
     isCollidingWithBlock(enemy) {
         if (this.getX() < enemy.getX() + enemy.getWidth() &&
             this.getX() + this.getWidth() > enemy.getX() &&
@@ -49,39 +63,51 @@ class Ball extends Entity {
             this.getY() + this.getHeight() > enemy.getY()) {
             return true;
         }
+        ;
         return false;
     }
+    ;
+    collidedWithBlock() {
+        this.wPos = -this.wPos;
+    }
+    ;
     collidedWithPlayerLeft() {
         this.wPos = 5;
         this.dPos -= 4;
         if (this.dPos < -6) {
             this.dPos = -6;
         }
+        ;
     }
+    ;
     collidedWithPlayerMiddle() {
         this.wPos = 5;
     }
+    ;
     collidedWithPlayerRight() {
         this.wPos = 5;
         this.dPos += 4;
-        if (this.dPos > 6) {
+        if (this.dPos >= 6) {
             this.dPos = 6;
         }
+        ;
     }
+    ;
     removeLife() {
-        this.wPos = 4;
-        this.yPos = this.canvas.getCenter().Y;
+        this.wPos = 3;
+        this.yPos = this.canvas.getHeight() - 200;
         this.dPos = this.canvas.randomNumber(-5, 5);
     }
-    collidedWithBlock() {
-        this.wPos = -this.wPos;
-    }
+    ;
 }
+;
 class Block extends Entity {
     constructor(canvas, imgSource, xPos, yPos, width, height) {
         super(canvas, imgSource, xPos, yPos, width, height);
     }
+    ;
 }
+;
 class Canvas {
     constructor(canvas) {
         this.canvas = canvas;
@@ -93,15 +119,18 @@ class Canvas {
         this.topoClicks = 0;
         this.difficultClicks = 0;
     }
+    ;
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
+    ;
     writeTextToCanvas(text, fontSize, xCoordinate, yCoordinate, color, aligment = "center") {
         this.ctx.font = `${fontSize}px Mars`;
         this.ctx.fillStyle = color;
         this.ctx.textAlign = aligment;
         this.ctx.fillText(text, xCoordinate, yCoordinate);
     }
+    ;
     writeImageToCanvas(src, xCoordinate, yCoordinate) {
         let element = document.createElement("img");
         element.src = src;
@@ -110,12 +139,15 @@ class Canvas {
             this.ctx.drawImage(element, xCoordinate, yCoordinate);
         });
     }
+    ;
     randomNumber(min, max) {
         return Math.round(Math.random() * (max - min) + min);
     }
+    ;
     getCenter() {
         return { X: this.canvas.width / 2, Y: this.canvas.height / 2 };
     }
+    ;
     writeStartButtonToCanvas(src, imageWidth, imageHeight, imageYpos) {
         const horizontalCenter = this.canvas.width / 2;
         const verticalCenter = this.canvas.height / 2;
@@ -133,8 +165,11 @@ class Canvas {
                         difficultView.createScreen();
                         this.clicks++;
                     }
+                    ;
                 }
+                ;
             }
+            ;
         });
     }
     ;
@@ -212,15 +247,14 @@ class Canvas {
     ;
     startEasyCountdown(seconds) {
         var counter = seconds;
-        this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
+        this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, this.getCenter().Y - 275, "white");
         var interval = setInterval(() => {
             this.clearCanvas();
-            this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
-            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y + 75, "white");
+            const levelView = new LevelView();
+            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y + 150, "white");
             counter--;
             if (counter < 0) {
                 clearInterval(interval);
-                const levelView = new LevelView();
                 levelView.setEasyQuestions();
             }
             ;
@@ -229,15 +263,14 @@ class Canvas {
     ;
     startTopoCountdown(seconds) {
         var counter = seconds;
-        this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
+        this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, this.getCenter().Y - 275, "white");
         var interval = setInterval(() => {
             this.clearCanvas();
-            this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
-            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y + 75, "white");
+            const levelView = new LevelView();
+            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y + 150, "white");
             counter--;
             if (counter < 0) {
                 clearInterval(interval);
-                const levelView = new LevelView();
                 levelView.setTopoQuestions();
             }
             ;
@@ -246,19 +279,41 @@ class Canvas {
     ;
     startDifficultCountdown(seconds) {
         var counter = seconds;
-        this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
+        this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, this.getCenter().Y - 275, "white");
         var interval = setInterval(() => {
             this.clearCanvas();
-            this.writeTextToCanvas('Europe Explorer', 100, this.getCenter().X, 100, "white");
-            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y + 75, "white");
+            const levelView = new LevelView();
+            this.writeTextToCanvas(`${counter}`, 250, this.getCenter().X, this.getCenter().Y + 150, "white");
             counter--;
             if (counter < 0) {
                 clearInterval(interval);
-                const levelView = new LevelView();
                 levelView.setDifficultQuestions();
             }
             ;
         }, 1000);
+    }
+    ;
+    writeTryAgainButtonToCanvas(src, imageWidth, imageHeight, imageYpos) {
+        const horizontalCenter = this.canvas.width / 2;
+        const verticalCenter = this.canvas.height / 2;
+        let buttonElement = document.createElement("img");
+        buttonElement.src = src;
+        buttonElement.addEventListener("load", () => {
+            this.ctx.drawImage(buttonElement, horizontalCenter - (imageWidth / 2), verticalCenter - imageYpos);
+            this.clicks = 1;
+        });
+        this.canvas.addEventListener("click", (event) => {
+            if (event.x > horizontalCenter - (imageWidth / 2) && event.x < horizontalCenter + (imageWidth / 2)) {
+                if (event.y > verticalCenter - imageYpos && event.y < verticalCenter - imageYpos + imageHeight) {
+                    if (this.clicks == 1) {
+                        location.reload();
+                    }
+                    ;
+                }
+                ;
+            }
+            ;
+        });
     }
     ;
     getHeight() {
@@ -270,56 +325,77 @@ class Canvas {
     }
     ;
 }
+;
 class Game {
     constructor() {
         this.draw = () => {
             this.startView.createScreen();
         };
-        const canvasElement = document.getElementById('canvas');
-        this.canvas = new Canvas(canvasElement);
         this.startView = new StartView();
+        this.playBackgroundAudio();
+        window.setInterval(this.playBackgroundAudio, 100000);
         this.draw();
     }
+    ;
+    playBackgroundAudio() {
+        let audio = new Audio();
+        audio.src = "./assets/sounds/backgroundmusic.mp3";
+        audio.load();
+        audio.play();
+    }
+    ;
 }
+;
 window.addEventListener('load', init);
 function init() {
     const gameName = new Game();
 }
+;
 class KeyBoardListener {
     constructor() {
         this.keyDownHandler = (event) => {
             if (event.keyCode == 37) {
                 this.leftPressed = true;
             }
+            ;
             if (event.keyCode == 39) {
                 this.rightPressed = true;
             }
+            ;
             if (event.keyCode == 49 || event.keyCode == 97) {
                 this.onePressed = true;
             }
+            ;
             if (event.keyCode == 50 || event.keyCode == 98) {
                 this.twoPressed = true;
             }
+            ;
             if (event.keyCode == 51 || event.keyCode == 99) {
                 this.threePressed = true;
             }
+            ;
         };
         this.keyUpHandler = (event) => {
             if (event.keyCode == 37) {
                 this.leftPressed = false;
             }
+            ;
             if (event.keyCode == 39) {
                 this.rightPressed = false;
             }
+            ;
             if (event.keyCode == 49 || event.keyCode == 97) {
                 this.onePressed = false;
             }
+            ;
             if (event.keyCode == 50 || event.keyCode == 98) {
                 this.twoPressed = false;
             }
+            ;
             if (event.keyCode == 51 || event.keyCode == 99) {
                 this.threePressed = false;
             }
+            ;
         };
         this.leftPressed = false;
         this.rightPressed = false;
@@ -329,27 +405,35 @@ class KeyBoardListener {
         window.addEventListener("keydown", this.keyDownHandler);
         window.addEventListener("keyup", this.keyUpHandler);
     }
+    ;
     getLeftPressed() {
         return this.leftPressed;
     }
+    ;
     getRightPressed() {
         return this.rightPressed;
     }
+    ;
     getOnePressed() {
         return this.onePressed;
     }
+    ;
     getTwoPressed() {
         return this.twoPressed;
     }
+    ;
     getThreePressed() {
         return this.threePressed;
     }
+    ;
     resetAnswer() {
         this.onePressed = false;
         this.twoPressed = false;
         this.threePressed = false;
     }
+    ;
 }
+;
 class Player extends Entity {
     constructor(canvas, imgSource, xPos, yPos, width, height) {
         super(canvas, imgSource, xPos, yPos, width, height);
@@ -359,16 +443,21 @@ class Player extends Entity {
         if (this.keyBoardListener.getLeftPressed()) {
             this.xPos -= 8;
         }
+        ;
         if (this.keyBoardListener.getRightPressed()) {
             this.xPos += 8;
         }
+        ;
         if (this.xPos < 0) {
             this.xPos = 0;
         }
+        ;
         if (this.getX() + (this.getWidth()) > window.innerWidth) {
             this.xPos = window.innerWidth - (this.getWidth());
         }
+        ;
     }
+    ;
     isCollidingWithBallLeft(enemy) {
         if (this.getX() < enemy.getX() + enemy.getWidth() &&
             this.getX() + this.getWidth() * (1 / 3) > enemy.getX() &&
@@ -376,8 +465,10 @@ class Player extends Entity {
             this.getY() + this.getHeight() > enemy.getY()) {
             return true;
         }
+        ;
         return false;
     }
+    ;
     isCollidingWithBallMiddle(enemy) {
         if (this.getX() + 67 < enemy.getX() + enemy.getWidth() &&
             this.getX() + this.getWidth() * (2 / 3) > enemy.getX() &&
@@ -385,8 +476,10 @@ class Player extends Entity {
             this.getY() + this.getHeight() > enemy.getY()) {
             return true;
         }
+        ;
         return false;
     }
+    ;
     isCollidingWithBallRight(enemy) {
         if (this.getX() + 134 < enemy.getX() + enemy.getWidth() &&
             this.getX() + this.getWidth() * (3 / 3) > enemy.getX() &&
@@ -394,34 +487,37 @@ class Player extends Entity {
             this.getY() + this.getHeight() > enemy.getY()) {
             return true;
         }
+        ;
         return false;
     }
+    ;
 }
+;
 class ViewBase {
     constructor() {
+        const canvasElement = document.getElementById('canvas');
+        this.canvas = new Canvas(canvasElement);
     }
-    render() {
-        this.canvas.clearCanvas();
-        this.createScreen();
-    }
+    ;
 }
+;
 class DifficultyView extends ViewBase {
     constructor() {
         super();
         this.createScreen = () => {
-            this.canvas.writeTextToCanvas('Europe Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
-            this.canvas.writeTextToCanvas('Kies een niveau:', 40, this.canvas.getCenter().X, 190, "white", "center");
+            this.canvas.writeTextToCanvas('Europe Explorer', 100, this.canvas.getCenter().X, this.canvas.getCenter().Y - 275, "white", "center");
+            this.canvas.writeTextToCanvas('Kies een niveau:', 40, this.canvas.getCenter().X, this.canvas.getCenter().Y - 185, "white", "center");
             this.canvas.writeTextToCanvas("Kies je moeilijkheidsgraad om het spel te beginnen. De balk bestuur je met de pijltjestoetsen", 20, this.canvas.getCenter().X, this.canvas.getHeight() - 50, "white");
             this.canvas.writeEasyDifficultyButtonToCanvas("./assets/images/makkelijk.png", 302, 70, this.canvas.getCenter().Y - 250);
             this.canvas.writeTopoDifficultyButtonToCanvas("./assets/images/topografie.png", 348, 73, this.canvas.getCenter().Y - 400);
             this.canvas.writeDifficultDifficultyButtonToCanvas("./assets/images/moeilijk.png", 253, 71, this.canvas.getCenter().Y - 550);
         };
-        const canvasElement = document.getElementById('canvas');
-        this.canvas = new Canvas(canvasElement);
         document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
     }
+    ;
 }
+;
 class LevelView extends ViewBase {
     constructor() {
         super();
@@ -432,23 +528,37 @@ class LevelView extends ViewBase {
             "./assets/images/blocks/yellowBlock.png"
         ];
         this.createScreen = () => {
+            if (this.gameState === "START") {
+                this.player.draw();
+                this.ball.draw();
+                this.canvas.writeTextToCanvas(`score: ${this.score}`, 40, 10, this.canvas.getHeight() - 60, "black", "left");
+                this.canvas.writeTextToCanvas(`lives: ${this.lives}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
+                for (let index = 0; index < this.blockArray.length; index++) {
+                    this.blockArray[index].draw();
+                }
+                ;
+            }
+            ;
             if (this.gameState === "PLAY") {
                 this.canvas.clearCanvas();
-                this.player.move();
-                this.player.draw();
                 this.ball.move();
+                this.player.move();
                 this.ball.draw();
+                this.player.draw();
                 this.canvas.writeTextToCanvas(`score: ${this.score}`, 40, 10, this.canvas.getHeight() - 60, "black", "left");
                 this.canvas.writeTextToCanvas(`lives: ${this.lives}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
                 if (this.player.isCollidingWithBallLeft(this.ball)) {
                     this.ball.collidedWithPlayerLeft();
                 }
+                ;
                 if (this.player.isCollidingWithBallMiddle(this.ball)) {
                     this.ball.collidedWithPlayerMiddle();
                 }
+                ;
                 if (this.player.isCollidingWithBallRight(this.ball)) {
                     this.ball.collidedWithPlayerRight();
                 }
+                ;
                 for (let index = 0; index < this.blockArray.length; index++) {
                     this.blockArray[index].draw();
                     if (this.ball.isCollidingWithBlock(this.blockArray[index])) {
@@ -457,8 +567,8 @@ class LevelView extends ViewBase {
                         this.score += 20;
                         if (this.blockArray.length < 1) {
                             this.score += 100;
-                            alert(`Goed gedaan! Je hebt het spel uitgespeeld. Je score was: ${this.score}`);
-                            location.reload();
+                            this.gameState = "SCORE";
+                            let scoreView = new Score(this.score);
                         }
                         if (this.blockArray.length == 28 || this.blockArray.length == 24 || this.blockArray.length == 20 || this.blockArray.length == 16 || this.blockArray.length == 12 || this.blockArray.length == 8 || this.blockArray.length == 4) {
                             this.questionAnswer = null;
@@ -467,9 +577,19 @@ class LevelView extends ViewBase {
                             document.body.style.background = "url('./assets/images/backgrounds/questionView.png') no-repeat ";
                             document.body.style.backgroundSize = "cover";
                         }
+                        ;
                     }
+                    ;
                 }
+                ;
             }
+            ;
+            if (this.ball.getY() + this.ball.getHeight() > this.canvas.getHeight()) {
+                this.score -= 50;
+                this.removeLife();
+                this.ball.removeLife();
+            }
+            ;
             if (this.gameState === "QUESTION") {
                 this.canvas.clearCanvas();
                 this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 25, 200);
@@ -482,67 +602,85 @@ class LevelView extends ViewBase {
                     this.questionAnswer = this.questions[this.numberRandom].a;
                     this.compareAnswers();
                 }
+                ;
                 if (this.keyBoardListener.getTwoPressed()) {
                     this.questionAnswer = this.questions[this.numberRandom].b;
                     this.compareAnswers();
                 }
+                ;
                 if (this.keyBoardListener.getThreePressed()) {
                     this.questionAnswer = this.questions[this.numberRandom].c;
                     this.compareAnswers();
                 }
+                ;
             }
-            if (this.ball.getY() + this.ball.getHeight() > this.canvas.getHeight()) {
-                this.removeLife();
-                this.ball.removeLife();
-            }
+            ;
         };
         this.compareAnswers = () => {
             if (this.questions[this.numberRandom].answer === this.questionAnswer) {
                 this.gameState = "COUNTDOWN";
                 this.score += 100;
-                this.startRightCountdown(5);
+                this.startRightCountdown(8);
             }
             else {
                 this.gameState = "COUNTDOWN";
                 this.score -= 50;
-                this.startWrongCountdown(5);
-                this.removeLife();
+                this.startWrongCountdown(8);
             }
+            ;
         };
         const canvasElement = document.getElementById('canvas');
-        this.canvas = new Canvas(canvasElement);
-        this.keyBoardListener = new KeyBoardListener();
-        this.questionAnswer = null;
-        this.gameState = "PLAY";
-        document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
-        document.body.style.backgroundSize = "cover";
-        this.canvas = new Canvas(canvasElement);
         this.player = new Player(canvasElement, "./assets/images/player/playerBlue.png", this.canvas.getCenter().X - 100, this.canvas.getHeight() - 30, 200, 25);
-        this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", this.canvas.getCenter().X, 500, 35, 35);
-        this.makeBlockArray();
+        this.ball = new Ball(canvasElement, "./assets/images/balls/redball.png", this.canvas.getCenter().X - 17, this.canvas.getHeight() - 200, 35, 35);
+        this.keyBoardListener = new KeyBoardListener();
+        this.blockArray = [];
+        this.gameState = "START";
         this.score = 0;
         this.lives = 3;
-        window.setInterval(this.createScreen, 1000 / 60);
+        this.blockRow = 0;
+        this.questionAnswer = null;
+        document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
+        this.makeBlockArray();
+        this.createScreen();
     }
+    ;
     startRightCountdown(seconds) {
         var counter = seconds;
         this.canvas.clearCanvas();
+        this.playAudio("./assets/sounds/correctanswer.mp3");
         this.canvas.writeTextToCanvas(`${this.questions[this.numberRandom].question}`, 30, this.canvas.getCenter().X, 125, "white");
         var interval = setInterval(() => {
-            this.canvas.clearCanvas();
-            this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 25, 200);
-            this.canvas.writeTextToCanvas(`Je antwoord ${this.questionAnswer} is goed. Je hebt 100 punten verdiend`, 30, this.canvas.getCenter().X, 125, "white");
-            this.canvas.writeTextToCanvas(`${counter}`, 150, this.canvas.getCenter().X + 235, this.canvas.getCenter().Y + 350, "white");
-            this.canvas.writeImageToCanvas("./assets/images/goedgedaan.png", this.canvas.getCenter().X + 100, this.canvas.getCenter().Y - 150);
+            if (counter > 3) {
+                this.canvas.clearCanvas();
+                this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 25, 200);
+                this.canvas.writeTextToCanvas(`Je antwoord ${this.questionAnswer} is goed. Je hebt 100 punten verdiend`, 30, this.canvas.getCenter().X, 125, "white");
+                this.canvas.writeTextToCanvas(`${counter}`, 150, this.canvas.getCenter().X + 235, this.canvas.getCenter().Y + 350, "white");
+                this.canvas.writeImageToCanvas("./assets/images/goedgedaan.png", this.canvas.getCenter().X + 100, this.canvas.getCenter().Y - 150);
+            }
+            ;
             counter--;
+            if (counter < 3) {
+                this.canvas.clearCanvas();
+                document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+                document.body.style.backgroundSize = "cover";
+                this.canvas.writeTextToCanvas(`${counter}`, 250, this.canvas.getCenter().X, this.canvas.getCenter().Y + 150, "white");
+                this.canvas.writeTextToCanvas(`score: ${this.score}`, 40, 10, this.canvas.getHeight() - 60, "black", "left");
+                this.canvas.writeTextToCanvas(`lives: ${this.lives}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
+                this.player.draw();
+                this.ball.draw();
+                for (let index = 0; index < this.blockArray.length; index++) {
+                    this.blockArray[index].draw();
+                }
+                ;
+            }
+            ;
             if (counter < 0) {
                 clearInterval(interval);
                 this.questions.splice(this.numberRandom, 1);
                 this.gameState = "PLAY";
                 this.canvas.clearCanvas();
                 this.keyBoardListener.resetAnswer();
-                document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
-                document.body.style.backgroundSize = "cover";
             }
             ;
         }, 1000);
@@ -551,36 +689,89 @@ class LevelView extends ViewBase {
     startWrongCountdown(seconds) {
         var counter = seconds;
         this.canvas.clearCanvas();
+        this.playAudio("./assets/sounds/wronganswer.mp3");
         this.canvas.writeTextToCanvas(`${this.questions[this.numberRandom].question}`, 30, this.canvas.getCenter().X, 125, "white");
-        var interval = setInterval(() => {
-            this.canvas.clearCanvas();
-            this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 25, 200);
-            this.canvas.writeTextToCanvas(`Je antwoord ${this.questionAnswer} is fout. Je bent 1 leven en 50 punten kwijtgeraakt`, 30, this.canvas.getCenter().X, 75, "white");
-            this.canvas.writeTextToCanvas(`${counter}`, 150, this.canvas.getCenter().X + 250, this.canvas.getCenter().Y + 350, "white");
-            this.canvas.writeTextToCanvas("Het goede antwoord was:", 30, this.canvas.getCenter().X, 150, "white");
-            this.canvas.writeTextToCanvas(` ${this.questions[this.numberRandom].answer}`, 30, this.canvas.getCenter().X + 225, 150, "lightgreen", "left");
-            this.canvas.writeImageToCanvas("./assets/images/helaas.png", this.canvas.getCenter().X + 100, this.canvas.getCenter().Y - 150);
-            counter--;
-            if (counter < 0) {
-                clearInterval(interval);
-                this.questions.splice(this.numberRandom, 1);
-                this.gameState = "PLAY";
-                this.canvas.clearCanvas();
-                this.keyBoardListener.resetAnswer();
-                document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
-                document.body.style.backgroundSize = "cover";
-            }
-            ;
-        }, 1000);
+        this.removeLife();
+        if (this.lives > 0) {
+            var interval = setInterval(() => {
+                if (counter > 3) {
+                    this.canvas.clearCanvas();
+                    this.canvas.writeImageToCanvas(`./assets/images/question/${this.questions[this.numberRandom].picture}`, 25, 200);
+                    this.canvas.writeTextToCanvas(`Je antwoord ${this.questionAnswer} is fout. Je bent 1 leven en 50 punten kwijtgeraakt`, 30, this.canvas.getCenter().X, 75, "white");
+                    this.canvas.writeTextToCanvas(`${counter}`, 150, this.canvas.getCenter().X + 250, this.canvas.getCenter().Y + 350, "white");
+                    this.canvas.writeTextToCanvas("Het goede antwoord was:", 30, this.canvas.getCenter().X, 150, "white");
+                    this.canvas.writeTextToCanvas(` ${this.questions[this.numberRandom].answer}`, 30, this.canvas.getCenter().X + 225, 150, "lightgreen", "left");
+                    this.canvas.writeImageToCanvas("./assets/images/helaas.png", this.canvas.getCenter().X + 100, this.canvas.getCenter().Y - 150);
+                }
+                ;
+                counter--;
+                if (counter < 3) {
+                    this.canvas.clearCanvas();
+                    document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+                    document.body.style.backgroundSize = "cover";
+                    this.canvas.writeTextToCanvas(`${counter}`, 250, this.canvas.getCenter().X, this.canvas.getCenter().Y + 150, "white");
+                    this.canvas.writeTextToCanvas(`score: ${this.score}`, 40, 10, this.canvas.getHeight() - 60, "black", "left");
+                    this.canvas.writeTextToCanvas(`lives: ${this.lives}`, 40, this.canvas.getWidth() - 100, this.canvas.getHeight() - 60, "black");
+                    this.player.draw();
+                    this.ball.draw();
+                    for (let index = 0; index < this.blockArray.length; index++) {
+                        this.blockArray[index].draw();
+                    }
+                    ;
+                }
+                ;
+                if (counter < 0) {
+                    clearInterval(interval);
+                    this.questions.splice(this.numberRandom, 1);
+                    this.gameState = "PLAY";
+                    this.canvas.clearCanvas();
+                    this.keyBoardListener.resetAnswer();
+                    document.body.style.background = "url('./assets/images/backgrounds/europaBackground.png') no-repeat ";
+                    document.body.style.backgroundSize = "cover";
+                }
+                ;
+            }, 1000);
+        }
+        ;
     }
     ;
     removeLife() {
         this.lives--;
-        if (this.lives == 0) {
-            alert(`Game over! Je bent al je levens kwijtgeraakt. Je score was ${this.score}`);
-            location.reload();
+        if (this.score < 0) {
+            this.score = 0;
         }
+        ;
+        if (this.lives == 0) {
+            this.gameState = "SCORE";
+            let scoreView = new Score(this.score);
+        }
+        ;
     }
+    ;
+    playAudio(src) {
+        let audio = new Audio();
+        audio.src = src;
+        audio.load();
+        audio.play();
+    }
+    ;
+    makeBlockArray() {
+        const canvasElement = document.getElementById('canvas');
+        let blockXPos = 10;
+        let blockYPos = 30;
+        while (this.blockRow < 4) {
+            this.blockArray.push(new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], blockXPos, blockYPos, 184, 61));
+            blockXPos += 190;
+            if (blockXPos > this.canvas.getWidth() - 183) {
+                blockXPos = 10;
+                blockYPos += 70;
+                this.blockRow++;
+            }
+            ;
+        }
+        ;
+    }
+    ;
     setEasyQuestions() {
         this.questions = [
             {
@@ -669,10 +860,13 @@ class LevelView extends ViewBase {
                 picture: "fjord.png"
             }
         ];
+        this.gameState = "PLAY";
+        window.setInterval(this.createScreen, 1000 / 60);
     }
     ;
     setTopoQuestions() {
-        this.questions = [{
+        this.questions = [
+            {
                 question: "Waar ligt Schotland in Verenigd koninkrijk?",
                 a: "In het noorden",
                 b: "in het midden",
@@ -778,7 +972,7 @@ class LevelView extends ViewBase {
                 answer: "Dublin",
                 picture: "westEuropa.png"
             }, {
-                question: "WWat is de naam van de stad op plaats 7?",
+                question: "Wat is de naam van de stad op plaats 7?",
                 a: "Glasgow",
                 b: "Marseille",
                 c: "Berlijn",
@@ -844,7 +1038,7 @@ class LevelView extends ViewBase {
                 question: "Wat is de naam van de stad op plaats 16?",
                 a: "Hamburg",
                 b: "Hamburger",
-                c: "Kaassouffle",
+                c: "Kaassoufflé",
                 answer: "Hamburg",
                 picture: "westEuropa.png"
             }, {
@@ -921,7 +1115,7 @@ class LevelView extends ViewBase {
                 question: "Wat is de naam van de oceaan/zee op plaats a?",
                 a: "Noordzee",
                 b: "Oostzee",
-                c: "Atlatische Oceaan",
+                c: "Atlantische Oceaan",
                 answer: "Atlantische Oceaan",
                 picture: "kaart-noordEuropa.png"
             }, {
@@ -934,7 +1128,7 @@ class LevelView extends ViewBase {
             }, {
                 question: "Wat is de naam van de oceaan/zee op plaats c?",
                 a: "Oostzee",
-                b: "Atlatische Oceaan",
+                b: "Atlantische Oceaan",
                 c: "Noordzee",
                 answer: "Oostzee",
                 picture: "kaart-noordEuropa.png"
@@ -942,7 +1136,7 @@ class LevelView extends ViewBase {
                 question: "Wat is de naam van de oceaan/zee op plaats d?",
                 a: "Noordelijke IJszee",
                 b: "Oostzee",
-                c: "Atlatische Oceaan",
+                c: "Atlantische Oceaan",
                 answer: "Noordelijke IJszee",
                 picture: "kaart-noordEuropa.png"
             }, {
@@ -1082,7 +1276,7 @@ class LevelView extends ViewBase {
                 question: "Welke gebergte ligt er op plaats i?",
                 a: "Pyreneeën",
                 b: "Ruhrgebied",
-                c: "Alplen",
+                c: "Alpen",
                 answer: "Ardennen",
                 picture: "westEuropa.png"
             }, {
@@ -1108,6 +1302,8 @@ class LevelView extends ViewBase {
                 picture: "westEuropa.png"
             }
         ];
+        this.gameState = "PLAY";
+        window.setInterval(this.createScreen, 1000 / 60);
     }
     ;
     setDifficultQuestions() {
@@ -1205,57 +1401,53 @@ class LevelView extends ViewBase {
                 picture: "rotterdam.png"
             }
         ];
+        this.gameState = "PLAY";
+        window.setInterval(this.createScreen, 1000 / 60);
     }
     ;
-    makeBlockArray() {
-        const canvasElement = document.getElementById('canvas');
-        this.blockArray = [new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 10, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 200, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 390, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 580, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 770, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 960, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1150, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1340, 30, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 10, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 200, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 390, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 580, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 770, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 960, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1150, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1340, 100, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 10, 170, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 200, 170, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 390, 170, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 580, 170, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 770, 170, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 960, 170, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1150, 170, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1340, 170, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 10, 240, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 200, 240, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 390, 240, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 580, 240, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 770, 240, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 960, 240, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1150, 240, 184, 61),
-            new Block(canvasElement, this.imageArray[this.canvas.randomNumber(0, this.imageArray.length - 1)], 1340, 240, 184, 61)];
+}
+;
+class Score extends ViewBase {
+    constructor(score) {
+        super();
+        this.createScreen = () => {
+            this.canvas.clearCanvas();
+            this.canvas.writeTextToCanvas('Europe Explorer', 100, this.canvas.getCenter().X, this.canvas.getCenter().Y - 275, "white", "center");
+            this.canvas.writeTextToCanvas(`${this.score}`, 100, this.canvas.getCenter().X, this.canvas.getCenter().Y, "white", "center");
+            this.canvas.writeTryAgainButtonToCanvas("./assets/images/probeeropnieuw.png", 1101, 117, this.canvas.getCenter().Y - 500);
+            if (this.score <= 500) {
+                this.canvas.writeTextToCanvas('Helaas! Probeer het nog een keer. Je score was:', 40, this.canvas.getCenter().X, this.canvas.getCenter().Y - 175, "white", "center");
+            }
+            ;
+            if (this.score > 500 && this.score <= 1000) {
+                this.canvas.writeTextToCanvas('Goed gedaan! Probeer het nog een keer. Je score was:', 40, this.canvas.getCenter().X, this.canvas.getCenter().Y - 175, "white", "center");
+            }
+            ;
+            if (this.score > 1000) {
+                this.canvas.writeTextToCanvas('Perfect! Probeer het nog een keer. Je score was:', 40, this.canvas.getCenter().X, this.canvas.getCenter().Y - 175, "white", "center");
+            }
+            ;
+        };
+        this.score = score;
+        document.body.style.background = "url('./assets/images/backgrounds/universalBackground.png') no-repeat ";
+        document.body.style.backgroundSize = "cover";
+        window.setInterval(this.createScreen, 1000 / 60);
     }
+    ;
 }
 ;
 class StartView extends ViewBase {
     constructor() {
         super();
         this.createScreen = () => {
-            this.canvas.writeTextToCanvas('Europe Explorer', 100, this.canvas.getCenter().X, 100, "white", "center");
+            this.canvas.writeTextToCanvas('Europe Explorer', 100, this.canvas.getCenter().X, this.canvas.getCenter().Y - 275, "white", "center");
             this.canvas.writeStartButtonToCanvas('./assets/images/startscreenButton.png', 294, 58, this.canvas.getCenter().Y - 200);
         };
-        const canvasElement = document.getElementById('canvas');
-        this.canvas = new Canvas(canvasElement);
         document.body.style.background = "url('./assets/images/backgrounds/startBackground.png') no-repeat ";
         document.body.style.backgroundSize = "cover";
         document.body.style.zIndex = "-1";
     }
+    ;
 }
+;
 //# sourceMappingURL=app.js.map

@@ -18,21 +18,31 @@ class Player extends Entity {
         this.keyBoardListener = new KeyBoardListener();
     }
 
+    /**
+     * The function move which moves the player
+     */
     public move(): void {
         if (this.keyBoardListener.getLeftPressed()) {
             this.xPos -= 8;
-        }
+        };
+
         if (this.keyBoardListener.getRightPressed()) {
             this.xPos += 8;
-        }
+        };
+
         if (this.xPos < 0) {
             this.xPos = 0;
-        }
+        };
+
         if (this.getX() + (this.getWidth()) > window.innerWidth) {
             this.xPos = window.innerWidth - (this.getWidth())
-        }
-    }
+        };
+    };
 
+    /**
+     * A function to detect a collision with the ball at the left side of the player
+     * @param enemy 
+     */
     public isCollidingWithBallLeft(enemy: Ball): boolean {
         if (
             this.getX() < enemy.getX() + enemy.getWidth() &&
@@ -41,10 +51,14 @@ class Player extends Entity {
             this.getY() + this.getHeight() > enemy.getY()
         ) {
             return true;
-        }
+        };
         return false;
-    }
+    };
 
+    /**
+     * A function to detect a collision with the ball in th middle of the player
+     * @param enemy 
+     */
     public isCollidingWithBallMiddle(enemy: Ball): boolean {
         if (
             this.getX() + 67 < enemy.getX() + enemy.getWidth() &&
@@ -53,11 +67,14 @@ class Player extends Entity {
             this.getY() + this.getHeight() > enemy.getY()
         ) {
             return true;
-        }
+        };
         return false;
-    }
+    };
 
-
+    /**
+     * A function to detect a collision with the ball at the right side of the player
+     * @param enemy 
+     */
     public isCollidingWithBallRight(enemy: Ball): boolean {
         if (
             this.getX() + 134 < enemy.getX() + enemy.getWidth() &&
@@ -66,7 +83,7 @@ class Player extends Entity {
             this.getY() + this.getHeight() > enemy.getY()
         ) {
             return true;
-        }
+        };
         return false;
-    }
-}
+    };
+};
